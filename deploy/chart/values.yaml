@@ -1,0 +1,149 @@
+# IMAX Triage Workspace — deployment configuration.
+#
+# Defaults here reproduce `kubectl apply -k deploy/k8s`: plaintext behind an
+# authenticating front, identity parsed but not enforced, enrichment services
+# answering from fixtures. Everything environment-specific is empty, so a chart
+# installed with no values runs the demonstration and asserts nothing about the
+# environment it landed in.
+#
+# NO ADDRESS, KEY OR CERTIFICATE BELONGS IN THIS FILE. scripts/preflight-airgap.sh
+# fails the build if an enclave hostname is ever committed, and the same rule
+# applies to anything ArgoCD reads out of git.
+
+image:
+  # Prefix for all six images, e.g. "registry.example/imax/". A kubelet resolves
+  # a bare name against Docker Hub, which is unreachable in the target
+  # environment — so this is effectively required there.
+  registry: ""
+  tag: "0.1.0"
+  pullPolicy: IfNotPresent
+
+serviceAccount:
+  create: true
+  name: imax
+  # IRSA. Set to the role ARN the environment grants us; the initContainer that
+  # reads certificates from Secrets Manager assumes it. Left empty, the
+  # credential chain falls through to the node instance profile, so the same
+  # chart works either way.
+  roleArn: ""
+
+# ---------------------------------------------------------------------------
+# TLS. Three postures:
+#   enabled: false           plaintext; the front is the only encrypted hop.
+#   enabled, source: secret  material from a Secret someone created.
+#   enabled, source: awssm   material read from AWS Secrets Manager at pod
+#                            start by an initContainer, staged on tmpfs.
+# The application is unaware of which: deploy/tls.js reads PEM files from
+# /etc/tls either way.
+# ---------------------------------------------------------------------------
+tls:
+  enabled: false
+  source: awssm            # secret | awssm
+  # require ⇒ mutual TLS. Leave none unless the environment mandates it.
+  clientAuth: none
+
+  secret:
+    # Name of a Secret carrying tls.crt, tls.key and ca.pem.
+    name: imax-tls
+
+  awssm:
+    region: us-iso-east-1
+    # Full base URLs. Supplied rather than derived from the region: the
+    # hostname pattern for the target region must not enter this repository.
+    endpoint: ""
+    stsEndpoint: ""
+    # Name or ARN of the secret holding the certificate. If one secret holds
+    # BOTH cert and key, set only this and leave keySecret empty.
+    certSecret: ""
+    keySecret: ""
+    caSecret: ""
+    # The volume must be writable by a non-root UID or the fetch succeeds and
+    # the write fails. kubelet adds this to the pod's supplementary groups.
+    fsGroup: 1000
+
+# ---------------------------------------------------------------------------
+# Caller identity, resolved from whatever the authenticating front forwards.
+#   disabled      parsed and displayed, nothing enforced
+#   proxy-header  flat headers (x-ain, x-name, ...)
+#   bearer-jwt    claims from the token the front forwards — this is the target environment
+# ---------------------------------------------------------------------------
+auth:
+  mode: disabled
+  # proxy-header mode
+  headerId: x-ain
+  headerName: x-name
+  headerGroups: x-ismemberof
+  headerOrg: x-org
+  # bearer-jwt mode. These are the common OIDC spellings, NOT confirmed against
+  # the Sponsor's STS. GET /api/whoami reports the names a real token carried.
+  headerToken: authorization
+  headerAccessToken: x-auth-request-access-token
+  claimId: sub
+  claimName: name
+  claimGroups: groups
+  claimOrg: org
+  groupSeparator: ",;"
+  # Comma-separated; caller must hold ANY one. Empty ⇒ authentication only.
+  requiredGroups: ""
+
+# ---------------------------------------------------------------------------
+# Live model gateway. All three values are required to switch it on; miss any
+# one and the services answer from fixtures — which the Sponsor has confirmed
+# is acceptable, and which the pods log at startup so it is never a surprise.
+# ---------------------------------------------------------------------------
+modelGateway:
+  # Base URL INCLUDING the version path (…/v1). The code appends
+  # /chat/completions, so an endpoint carrying the suffix 404s.
+  endpoint: ""
+  # Deliberately not a real model name: an unset deployment should fail visibly
+  # rather than request something that happens to exist elsewhere.
+  name: SET-ME
+  timeoutMs: "20000"
+  # Prefer an existing Secret over putting a key in values. If both are empty
+  # the chart creates an empty placeholder Secret so a fresh install succeeds.
+  existingSecret: ""
+  apiKey: ""
+
+# Ingress is how traffic normally reaches this on Kubernetes: the platform's
+# ingress controller terminates TLS and routes to the Service. The application
+# ships no proxy of its own.
+ingress:
+  enabled: false
+  className: ""
+  host: ""
+  path: /
+  pathType: Prefix
+  annotations: {}
+  tls: []
+
+networkPolicy:
+  enabled: true
+
+spa:
+  replicas: 1
+  port: 8443
+  resources:
+    requests: {cpu: 100m, memory: 128Mi}
+    limits: {cpu: 250m, memory: 256Mi}
+
+mocks:
+  replicas: 1
+  port: 5177
+  resources:
+    requests: {cpu: 100m, memory: 128Mi}
+    limits: {cpu: 250m, memory: 256Mi}
+  # The five enrichment services. SERVICE selects the route module inside the
+  # image; the names are also the in-cluster DNS names the edge dials and the
+  # SANs a certificate must cover.
+  services:
+    - search
+    - translation
+    - entities
+    - summarize
+    - ocr
+
+# Mounted at /etc/ssl/enclave when present, with NODE_EXTRA_CA_CERTS pointed at
+# it, so the enrichment pods trust the model gateway's internal CA. Optional —
+# populate with deploy/enclave-ca.sh.
+enclaveCA:
+  configMapName: imax-enclave-ca

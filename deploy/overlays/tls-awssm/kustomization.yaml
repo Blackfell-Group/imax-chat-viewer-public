@@ -1,0 +1,108 @@
+# TLS everywhere, with certificates read from AWS Secrets Manager.
+#
+#   kubectl apply -k deploy/overlays/tls-awssm
+#
+# Sibling of ../tls, not a replacement. Both produce the same running state —
+# all six pods serving https, the edge dialling the enrichment pods over TLS,
+# probes on HTTPS. They differ only in where the certificate comes from:
+#
+#   ../tls        an imax-tls Secret a human created with `kubectl create
+#                 secret --from-file`. Right when someone has PEM files in
+#                 hand, and what CI exercises.
+#   ../tls-awssm  an initContainer reads the material from AWS Secrets Manager
+#                 at pod start and stages it on an in-memory volume. Right when
+#                 the cluster is automated and nobody is running kubectl —
+#                 which is the target environment, on AWS the target AWS partition, where a role grants access to
+#                 specific certificate secrets.
+#
+# Nothing about the application changes between them. deploy/tls.js still reads
+# PEM files from /etc/tls; only the thing that fills /etc/tls is different.
+#
+# ---------------------------------------------------------------------------
+# BEFORE THIS WORKS, three values must be set below, and one permission granted
+# on the AWS side (see ../../k8s/serviceaccount.yaml for the policy to ask for):
+#
+#   TLS_CERT_SECRET               name or ARN of the certificate secret
+#   TLS_KEY_SECRET                name or ARN of the key secret — LEAVE EMPTY
+#                                 if one secret carries both
+#   AWS_SECRETSMANAGER_ENDPOINT   regional endpoint URL
+#
+# Every one of them is environment material. The endpoint in particular is
+# supplied rather than derived from the region, because the hostname pattern
+# for the target region is one scripts/preflight-airgap.sh refuses to let into
+# this repository — the same rule that keeps the model gateway address out.
+#
+# The certificate must be valid for every name that gets dialled: the
+# in-cluster service names imax-mock-search, imax-mock-translation,
+# imax-mock-entities, imax-mock-summarize, imax-mock-ocr, plus whatever name
+# the front uses for imax-spa. See AIRGAP.md §10.
+# ---------------------------------------------------------------------------
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - ../../k8s
+
+configMapGenerator:
+  # Identical to ../tls: this half is about how the pod SERVES, not where the
+  # material came from, and the two overlays must not drift.
+  - name: imax-tls-config
+    literals:
+      - TLS_CERT_FILE=/etc/tls/tls.crt
+      - TLS_KEY_FILE=/etc/tls/tls.key
+      - TLS_CA_FILE=/etc/tls/ca.pem
+      # require ⇒ mutual TLS: clients must present a cert signed by ca.pem.
+      # Leave at none unless the enclave mandates mTLS between pods.
+      - TLS_CLIENT_AUTH=none
+      # The SPA edge dials the enrichment pods over TLS as well.
+      - UPSTREAM_SCHEME=https
+
+  # The AWS half. Read only by the initContainer; the serving container never
+  # sees these and holds no cloud configuration.
+  - name: imax-tls-source
+    literals:
+      - AWS_REGION=us-iso-east-1
+      # Full base URL of the regional Secrets Manager endpoint. Unset ⇒ the
+      # initContainer refuses to start, by design: a pod that cannot fetch its
+      # certificate must never reach a state where it could serve plaintext.
+      - AWS_SECRETSMANAGER_ENDPOINT=
+      # Required for IRSA — the initContainer exchanges the projected
+      # service-account token for role credentials here. Not needed when
+      # credentials come from the node instance profile.
+      - AWS_STS_ENDPOINT=
+      #
+      # Two secrets (cert and key held separately):
+      #   TLS_CERT_SECRET=<cert secret>   TLS_KEY_SECRET=<key secret>
+      # One secret carrying both:
+      #   TLS_CERT_SECRET=<combined>      TLS_KEY_SECRET=   (leave empty)
+      #
+      # Either way the payload may be raw PEM or a JSON object; the key names
+      # inside a JSON secret are matched against the common spellings, so a
+      # secret we did not author usually just works. deploy/secrets-init.js
+      # names the secret and lists what it found when it does not.
+      - TLS_CERT_SECRET=
+      - TLS_KEY_SECRET=
+      # Optional. Also used to verify upstreams, so setting it turns on
+      # verification of the enrichment pods' certificates by the edge.
+      - TLS_CA_SECRET=
+generatorOptions:
+  disableNameSuffixHash: true
+
+# One JSON6902 patch per Deployment. Two reasons it is not a single
+# label-selected strategic merge: the container name is a merge key, so naming
+# a container that does not exist silently ADDS one; and envFrom/volumeMounts
+# have no merge key, so a strategic merge REPLACES them and would drop the
+# model-gateway and auth configuration. These patches append.
+patches:
+  - path: patch-imax-spa.yaml
+    target: {kind: Deployment, name: imax-spa}
+  - path: patch-imax-mock-search.yaml
+    target: {kind: Deployment, name: imax-mock-search}
+  - path: patch-imax-mock-translation.yaml
+    target: {kind: Deployment, name: imax-mock-translation}
+  - path: patch-imax-mock-entities.yaml
+    target: {kind: Deployment, name: imax-mock-entities}
+  - path: patch-imax-mock-summarize.yaml
+    target: {kind: Deployment, name: imax-mock-summarize}
+  - path: patch-imax-mock-ocr.yaml
+    target: {kind: Deployment, name: imax-mock-ocr}

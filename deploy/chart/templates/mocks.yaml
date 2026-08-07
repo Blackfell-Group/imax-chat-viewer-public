@@ -1,0 +1,93 @@
+{{/*
+The five enrichment services. They were five near-identical 103-line manifests
+differing only in a name — 515 lines where a rename had to be made correctly in
+five places. One loop instead, so they cannot drift from each other.
+*/}}
+{{- $root := . -}}
+{{- range $svc := .Values.mocks.services }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: imax-mock-{{ $svc }}
+  labels:
+    app: imax-mock-{{ $svc }}
+    {{- include "imax.labels" $root | nindent 4 }}
+spec:
+  replicas: {{ $root.Values.mocks.replicas }}
+  selector:
+    matchLabels:
+      app: imax-mock-{{ $svc }}
+  template:
+    metadata:
+      labels:
+        app: imax-mock-{{ $svc }}
+        {{- include "imax.labels" $root | nindent 8 }}
+    spec:
+      serviceAccountName: {{ $root.Values.serviceAccount.name }}
+      securityContext: {{- include "imax.podSecurityContext" $root | nindent 8 }}
+      {{- include "imax.certInit" (dict "root" $root "name" (printf "mock-%s" $svc)) | nindent 6 }}
+      containers:
+        - name: imax-mock-{{ $svc }}
+          image: {{ include "imax.image" (dict "root" $root "name" (printf "mock-%s" $svc)) }}
+          imagePullPolicy: {{ $root.Values.image.pullPolicy }}
+          securityContext: {{- include "imax.containerSecurityContext" $root | nindent 12 }}
+          envFrom:
+            - configMapRef:
+                name: {{ $root.Release.Name }}-model-gateway
+                optional: true
+            - secretRef:
+                name: {{ $root.Values.modelGateway.existingSecret | default (printf "%s-model-gateway" $root.Release.Name) }}
+                optional: true
+            {{- if $root.Values.tls.enabled }}
+            - configMapRef:
+                name: {{ $root.Release.Name }}-tls-config
+            {{- end }}
+          volumeMounts:
+            # The model gateway presents an internal-CA certificate; without
+            # this every gateway call fails verification and reads like a
+            # network outage. Optional, so the fixture default is unaffected.
+            - name: enclave-ca
+              mountPath: /etc/ssl/enclave
+              readOnly: true
+            {{- include "imax.tlsVolumeMount" $root | nindent 12 }}
+          ports:
+            - containerPort: {{ $root.Values.mocks.port }}
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: {{ $root.Values.mocks.port }}
+              scheme: {{ include "imax.probeScheme" $root }}
+            initialDelaySeconds: 3
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: {{ $root.Values.mocks.port }}
+              scheme: {{ include "imax.probeScheme" $root }}
+            initialDelaySeconds: 2
+            periodSeconds: 5
+          resources: {{- toYaml $root.Values.mocks.resources | nindent 12 }}
+      volumes:
+        - name: enclave-ca
+          configMap:
+            name: {{ $root.Values.enclaveCA.configMapName }}
+            optional: true
+        {{- include "imax.tlsVolume" $root | nindent 8 }}
+---
+# ClusterIP only: the SPA pod is the sole user-facing surface.
+apiVersion: v1
+kind: Service
+metadata:
+  name: imax-mock-{{ $svc }}
+  labels:
+    app: imax-mock-{{ $svc }}
+    {{- include "imax.labels" $root | nindent 4 }}
+spec:
+  type: ClusterIP
+  selector:
+    app: imax-mock-{{ $svc }}
+  ports:
+    - port: {{ $root.Values.mocks.port }}
+      targetPort: {{ $root.Values.mocks.port }}
+{{- end }}

@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="760" height="760" viewBox="0 0 380 380">
+  <rect width="380" height="380" fill="#f4efe3"/>
+  <rect x="14" y="14" width="352" height="352" fill="none" stroke="#8a7f66" stroke-width="2"/>
+  <text x="340" y="58" text-anchor="start" direction="rtl" font-family="'Noto Naskh Arabic','Noto Sans Arabic','Geeza Pro','Amiri','Scheherazade New',serif" font-size="22" font-weight="bold" fill="#3a3428">بوليصة شحن</text>
+  <line x1="40" y1="74" x2="340" y2="74" stroke="#8a7f66" stroke-width="1"/>
+  <g font-family="'Noto Naskh Arabic','Noto Sans Arabic','Geeza Pro','Amiri','Scheherazade New',serif" font-size="15" fill="#42392b" text-anchor="start" direction="rtl">
+    <text x="340" y="108">رقم البوليصة: GW-2026-0630-114</text>
+    <text x="340" y="140">السفينة: نجمة سرت</text>
+    <text x="340" y="172">ميناء التحميل: مصراتة</text>
+    <text x="340" y="204">ميناء التفريغ: طرابلس</text>
+    <text x="340" y="236">المرسل إليه: شركة الكريم للتجارة</text>
+    <text x="340" y="268">البضاعة: ٤٢ صندوق قطع غيار</text>
+    <text x="340" y="300">الوزن الإجمالي: ٦٣٠٠ كغم</text>
+    <text x="340" y="332">التاريخ: ٣٠ يونيو ٢٠٢٦</text>
+  </g>
+  <!-- Port stamp sits left: the body text is right-aligned RTL, so the left
+       third is the only clear space. It used to sit right, which only looked
+       fine while the text was overflowing off-canvas. -->
+  <g transform="rotate(-11 106 320)">
+    <ellipse cx="106" cy="320" rx="52" ry="28" fill="none" stroke="#7a4d8f" stroke-width="2" opacity="0.7"/>
+    <text x="106" y="325" text-anchor="middle" font-family="'Noto Naskh Arabic','Noto Sans Arabic','Geeza Pro','Amiri','Scheherazade New',serif" font-size="11" fill="#7a4d8f" opacity="0.8">ميناء مصراتة</text>
+  </g>
+</svg>

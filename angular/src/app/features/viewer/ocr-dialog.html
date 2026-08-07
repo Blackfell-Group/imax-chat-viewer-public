@@ -1,0 +1,244 @@
+<div
+  class="ocr-backdrop"
+  role="button"
+  tabindex="0"
+  aria-label="Close OCR viewer"
+  (click)="closed.emit()"
+  (keydown.escape)="closed.emit()"
+></div>
+<div
+  class="ocr-modal"
+  role="dialog"
+  data-testid="ocr-dialog"
+  aria-label="OCR Viewer"
+  [class.maximized]="maximized()"
+  [style.width.px]="maximized() ? null : widthPx()"
+  [style.height.px]="maximized() ? null : heightPx()"
+>
+  <div class="ocr-title">
+    <span class="title-text">OCR Viewer · {{ open().attachment.name }}</span>
+    <span class="zoom-group">
+      <button
+        class="action-btn"
+        type="button"
+        title="Fit to pane"
+        data-testid="ocr-zoom-fit"
+        [class.on]="zoom() === 'fit'"
+        (click)="setZoom('fit')"
+      >
+        <mat-icon>fit_screen</mat-icon>
+      </button>
+      <button
+        class="action-btn"
+        type="button"
+        title="Actual size"
+        data-testid="ocr-zoom-1"
+        [class.on]="zoom() === 1"
+        (click)="setZoom(1)"
+      >
+        <mat-icon>crop_original</mat-icon>
+      </button>
+      <button
+        class="action-btn"
+        type="button"
+        title="Zoom to 200%"
+        data-testid="ocr-zoom-2"
+        [class.on]="zoom() === 2"
+        (click)="setZoom(2)"
+      >
+        <mat-icon>zoom_in</mat-icon>
+      </button>
+    </span>
+    <button
+      class="action-btn"
+      type="button"
+      [title]="maximized() ? 'Restore' : 'Maximize'"
+      data-testid="ocr-maximize"
+      [attr.aria-pressed]="maximized()"
+      (click)="toggleMaximize()"
+    >
+      <mat-icon>{{ maximized() ? 'close_fullscreen' : 'open_in_full' }}</mat-icon>
+    </button>
+    <button class="action-btn" type="button" title="Close" (click)="closed.emit()">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <div class="ocr-split">
+    <div class="ocr-image-pane" [style.flex]="'0 0 ' + splitRatio() * 100 + '%'">
+      <div class="ocr-image">
+        <img [src]="imageUri()" [alt]="open().attachment.name" [ngStyle]="imageStyle()" />
+      </div>
+      @if (pageCount() > 1) {
+        <div class="pager">
+          <button
+            class="action-btn"
+            type="button"
+            title="Previous page"
+            data-testid="ocr-page-prev"
+            [disabled]="pageIndex() === 0"
+            (click)="turnPage(-1)"
+          >
+            <mat-icon>chevron_left</mat-icon>
+          </button>
+          <span class="pager-indicator" data-testid="ocr-page-indicator">
+            Page {{ pageIndex() + 1 }} / {{ pageCount() }}
+          </span>
+          <button
+            class="action-btn"
+            type="button"
+            title="Next page"
+            data-testid="ocr-page-next"
+            [disabled]="pageIndex() === pageCount() - 1"
+            (click)="turnPage(1)"
+          >
+            <mat-icon>chevron_right</mat-icon>
+          </button>
+        </div>
+      }
+    </div>
+    <div
+      class="split-handle"
+      role="separator"
+      aria-orientation="vertical"
+      aria-label="Resize scan and text panes"
+      data-testid="ocr-split-handle"
+      (pointerdown)="startSplit($event)"
+    ></div>
+    <div class="ocr-text">
+      <span class="caption">
+        EXTRACTED TEXT
+        @if (ocr(); as o) {
+          · {{ o.engine }}@if (o.srcLang) { · {{ o.srcLang.toUpperCase() }}} · schema {{ o.schemaVersion }}@if (pageCount() > 1) { · page {{ pageIndex() + 1 }} of {{ pageCount() }}}
+        } @else {
+          · running…
+        }
+      </span>
+      <div class="blocks" data-testid="ocr-blocks">
+        @for (b of visibleBlocks(); track $index) {
+          <p class="block-line" dir="auto">{{ b.text }}</p>
+        }
+      </div>
+      @if (ocr()?.englishGloss; as gloss) {
+        <div class="gloss">
+          <div class="gloss-header">
+            <span class="caption">ENGLISH GLOSS · mock-translate</span>
+          </div>
+          <p class="gloss-text" data-testid="ocr-gloss">{{ gloss }}</p>
+        </div>
+      }
+    </div>
+  </div>
+
+  <div class="doc-annotation" data-testid="doc-annotation">
+    <span class="caption strong">OFFICER ANNOTATION</span>
+
+    <div class="tag-row">
+      <mat-icon class="tag-icon">sell</mat-icon>
+      @for (tag of quickTags; track tag) {
+        <button
+          class="chip chip-secondary"
+          type="button"
+          [class.on]="tags().includes(tag)"
+          [attr.data-testid]="'doctag-' + tag"
+          (click)="toggleTag(tag)"
+        >
+          {{ tag }}
+        </button>
+      }
+      <!-- Session vocabulary: every custom tag coined on any document, so one
+           invented here can be applied to the next scan. Lit when it is on
+           this document; click toggles. -->
+      @for (tag of customTags(); track tag) {
+        <button
+          class="chip chip-secondary"
+          type="button"
+          [class.on]="tags().includes(tag)"
+          [attr.data-testid]="'doctag-' + tag"
+          [title]="tags().includes(tag) ? 'Remove from this document' : 'Apply to this document'"
+          (click)="toggleTag(tag)"
+        >
+          {{ tag }}
+        </button>
+      }
+      <span class="tag-entry">
+        <input
+          class="tag-input"
+          type="text"
+          placeholder="new tag"
+          aria-label="Add a new tag"
+          data-testid="doctag-input"
+          [value]="tagInput()"
+          (input)="tagInput.set($any($event.target).value)"
+          (keydown.enter)="addCustomTag($event)"
+          (blur)="addCustomTag()"
+        />
+        <button
+          class="chip chip-add"
+          type="button"
+          title="Add tag"
+          data-testid="doctag-add"
+          [disabled]="!tagInput().trim()"
+          (click)="addCustomTag($event)"
+        >
+          <mat-icon class="add-icon">add</mat-icon>
+          Add
+        </button>
+      </span>
+    </div>
+
+    @if (noteEditing()) {
+      <div class="edit-block">
+        <textarea
+          class="edit-area"
+          rows="2"
+          placeholder="Officer interpretation — what this document is, who it implicates, what it corroborates…"
+          data-testid="doc-note-field"
+          [value]="noteDraft()"
+          (input)="noteDraft.set($any($event.target).value)"
+        ></textarea>
+        <div class="edit-actions">
+          <button class="solid-btn" type="button" data-testid="doc-note-save" (click)="saveNote()">
+            Save note
+          </button>
+          <button class="text-btn" type="button" (click)="noteEditing.set(false)">Cancel</button>
+          @if (note()) {
+            <button class="text-btn danger" type="button" (click)="deleteNote()">Delete</button>
+          }
+        </div>
+      </div>
+    } @else if (note(); as n) {
+      <div class="note-display" data-testid="doc-note-display">
+        <div class="note-header">
+          <mat-icon class="note-icon">comment</mat-icon>
+          <span class="note-label">NOTE</span>
+          <button
+            class="action-btn"
+            type="button"
+            title="Edit note"
+            data-testid="doc-note-edit"
+            (click)="startNote(n)"
+          >
+            <mat-icon>edit_note</mat-icon>
+          </button>
+        </div>
+        <p class="note-text">{{ n }}</p>
+      </div>
+    } @else {
+      <button class="text-btn add-note" type="button" data-testid="doc-note-add" (click)="startNote('')">
+        <mat-icon class="note-icon">comment</mat-icon>
+        Add note
+      </button>
+    }
+  </div>
+
+  @if (!maximized()) {
+    <div
+      class="resize-grip"
+      role="separator"
+      aria-label="Resize viewer"
+      data-testid="ocr-resize"
+      (pointerdown)="startResize($event)"
+    ></div>
+  }
+</div>

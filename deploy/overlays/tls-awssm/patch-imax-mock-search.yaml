@@ -1,0 +1,76 @@
+# imax-mock-search: stage the certificate from Secrets Manager, switch to TLS,
+# health-check over HTTPS.
+#
+# JSON6902, not a strategic merge: envFrom and volumeMounts are lists with no
+# merge key, so a strategic merge REPLACES them — which would silently drop the
+# model-gateway and auth configuration this pod already reads. These operations
+# append.
+#
+# Note the trailing /- on volumes and volumeMounts: this pod already carries
+# the enclave-ca mount, so these APPEND. patch-imax-spa.yaml creates the lists
+# instead, because imax-spa has none in the base.
+# fsGroup, or the initContainer cannot write the certificate it just fetched.
+# The images run as a non-root UID and an emptyDir is owned by root, so without
+# this the fetch succeeds and the WRITE fails with EACCES — the pod holds in
+# Init:Error having done all the hard parts. kubelet adds fsGroup to the pod's
+# supplementary groups and setgids the volume, so this works whatever UID the
+# namespace assigns; runAsUser stays deliberately unpinned.
+- op: add
+  path: /spec/template/spec/securityContext/fsGroup
+  value: 1000
+- op: add
+  path: /spec/template/spec/containers/0/envFrom/-
+  value:
+    configMapRef:
+      name: imax-tls-config
+- op: add
+  path: /spec/template/spec/volumes/-
+  value:
+    name: tls
+    # emptyDir, not a Secret: the material is fetched at pod start by the
+    # initContainer below. `medium: Memory` keeps the private key off the
+    # node's disk — it lives in a tmpfs that dies with the pod.
+    emptyDir:
+      medium: Memory
+- op: add
+  path: /spec/template/spec/initContainers
+  value:
+    - name: fetch-certs
+      # The pod's own image. No second image to build, scan, or ferry, and the
+      # staging code is version-locked to the code that will read it.
+      image: imax-mock-search:0.1.0
+      imagePullPolicy: IfNotPresent
+      command: ["node", "/app/secrets-init.js"]
+      envFrom:
+        - configMapRef:
+            name: imax-tls-source
+        - configMapRef:
+            name: imax-tls-config
+      # Writable here, read-only on the serving container below.
+      volumeMounts:
+        - name: tls
+          mountPath: /etc/tls
+      securityContext:
+        allowPrivilegeEscalation: false
+        readOnlyRootFilesystem: true
+        capabilities:
+          drop: ["ALL"]
+      resources:
+        requests:
+          cpu: 50m
+          memory: 64Mi
+        limits:
+          cpu: 200m
+          memory: 128Mi
+- op: add
+  path: /spec/template/spec/containers/0/volumeMounts/-
+  value:
+    name: tls
+    mountPath: /etc/tls
+    readOnly: true
+- op: add
+  path: /spec/template/spec/containers/0/livenessProbe/httpGet/scheme
+  value: HTTPS
+- op: add
+  path: /spec/template/spec/containers/0/readinessProbe/httpGet/scheme
+  value: HTTPS

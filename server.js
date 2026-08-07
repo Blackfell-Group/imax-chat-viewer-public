@@ -19,6 +19,15 @@ app.use('/api/entities', require('./routes/entities'));
 app.use('/api/summarize', require('./routes/summarize'));
 app.use('/api/ocr', require('./routes/ocr'));
 
+// Caller identity. In a deployment this is served by the SPA host
+// (deploy/spa-entry.js), which resolves it from what the authenticating front
+// forwards. Locally there is no front, so the endpoint answered 404 and the
+// SPA logged a console error on every page load — the first thing anyone
+// running `npm run dev:ng` would see. Serve the same shape here, with the
+// mode named honestly, so dev matches the deployment and the console is clean.
+const identity = require('./deploy/identity');
+app.get('/api/whoami', (req, res) => res.json(identity.describe(identity.parse(req.headers))));
+
 app.get('/healthz', (req, res) => res.json({ ok: true, services: ['search', 'translate', 'entities', 'summarize', 'ocr'] }));
 
 const PORT = process.env.PORT || 5177;

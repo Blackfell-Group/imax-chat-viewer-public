@@ -13,44 +13,39 @@ answering from fixtures. Nothing environment-specific is assumed.
 
 ## ArgoCD
 
-```yaml
-apiVersion: argoproj.io/v1alpha1
-kind: Application
-metadata:
-  name: imax
-  namespace: argocd
-spec:
-  project: default
-  source:
-    repoURL: https://github.com/Blackfell-Group/imax-chat-viewer-public.git
-    targetRevision: main
-    path: deploy/chart
-    helm:
-      values: |
-        image:
-          registry: <internal-registry>/imax/
-        tls:
-          enabled: true
-          source: awssm
-          awssm:
-            endpoint: <regional Secrets Manager endpoint>
-            stsEndpoint: <regional STS endpoint>
-            certSecret: <secret name or ARN>
-            keySecret: ""          # empty when one secret holds cert AND key
-        serviceAccount:
-          roleArn: <role our workload may assume>
-        auth:
-          mode: bearer-jwt
-        ingress:
-          enabled: true
-          host: <hostname>
-  destination:
-    server: https://kubernetes.default.svc
-    namespace: imax
-  syncPolicy:
-    automated: {prune: true, selfHeal: true}
-    syncOptions: [CreateNamespace=true]
+The Application is shipped as a file, not as something to retype:
+
+```sh
+$EDITOR deploy/argocd/application.yaml   # replace every <angle-bracket> value
+kubectl apply -f deploy/argocd/application.yaml
 ```
+
+Every placeholder in it is a value that cannot be known outside the enclave, and none of
+them requires a code change — `docs/architecture.md` §10 lists them with the failure each
+one produces if it is wrong.
+
+Two choices in that file worth knowing about, because both are deliberate:
+
+- **`targetRevision` is pinned to a tag**, not `main`. A prototype under evaluation should
+  not change under the evaluator because someone pushed.
+- **`syncPolicy` is not automated.** An unattended sync during a demonstration is a failure
+  mode with no upside. Turn on automated pruning and self-heal once it is past evaluation.
+
+Verified: `helm template` renders 19 objects from exactly the values in that file, `helm
+lint` passes against them, and the chart/kustomize equivalence check still agrees.
+
+### Milestone evidence
+
+There is no `kubectl` against the target environment — deployment is a declarative sync.
+One command carries everything the TDD asks for as M2 verification:
+
+```sh
+argocd app get imax -o yaml
+```
+
+Sync history is the "deployment log", the health and resource tree is "running pods", and
+the source block is "repo access".
+
 
 ## The values that matter
 

@@ -21,7 +21,17 @@
       <button
         class="action-btn"
         type="button"
-        title="Fit to pane"
+        title="Fit the page width"
+        data-testid="ocr-zoom-width"
+        [class.on]="zoom() === 'width'"
+        (click)="setZoom('width')"
+      >
+        <mat-icon>fit_page</mat-icon>
+      </button>
+      <button
+        class="action-btn"
+        type="button"
+        title="Fit the whole page"
         data-testid="ocr-zoom-fit"
         [class.on]="zoom() === 'fit'"
         (click)="setZoom('fit')"
@@ -64,7 +74,12 @@
     </button>
   </div>
 
-  <div class="ocr-split">
+  <!-- Stacked, not side by side. The scans are portrait pages; a horizontal
+       split gave the image a landscape half-pane and shrank an A4 document to
+       thumbnail size, which is the thing the review complained about. Full
+       width for the scan, then the original text, then the English — the order
+       an officer reads them in. -->
+  <div class="ocr-body">
     <div class="ocr-image-pane" [style.flex]="'0 0 ' + splitRatio() * 100 + '%'">
       <div class="ocr-image">
         <img [src]="imageUri()" [alt]="open().attachment.name" [ngStyle]="imageStyle()" />
@@ -97,35 +112,104 @@
         </div>
       }
     </div>
+
     <div
       class="split-handle"
       role="separator"
-      aria-orientation="vertical"
-      aria-label="Resize scan and text panes"
+      aria-orientation="horizontal"
+      aria-label="Resize scan and text"
       data-testid="ocr-split-handle"
       (pointerdown)="startSplit($event)"
     ></div>
+
     <div class="ocr-text">
-      <span class="caption">
-        EXTRACTED TEXT
-        @if (ocr(); as o) {
-          · {{ o.engine }}@if (o.srcLang) { · {{ o.srcLang.toUpperCase() }}} · schema {{ o.schemaVersion }}@if (pageCount() > 1) { · page {{ pageIndex() + 1 }} of {{ pageCount() }}}
-        } @else {
-          · running…
-        }
-      </span>
-      <div class="blocks" data-testid="ocr-blocks">
-        @for (b of visibleBlocks(); track $index) {
-          <p class="block-line" dir="auto">{{ b.text }}</p>
-        }
-      </div>
-      @if (ocr()?.englishGloss; as gloss) {
-        <div class="gloss">
+      <section class="text-section">
+        <span class="caption">
+          EXTRACTED TEXT — ORIGINAL
+          @if (ocr(); as o) {
+            · {{ o.engine }}@if (o.srcLang) { · {{ o.srcLang.toUpperCase() }}} · schema {{ o.schemaVersion }}@if (pageCount() > 1) { · page {{ pageIndex() + 1 }} of {{ pageCount() }}}
+          } @else {
+            · running…
+          }
+        </span>
+        <!-- One block per line, numbered. An OCR block is a line of the
+             document; running them together loses which is which, and an
+             officer citing a document needs to be able to point at one. -->
+        <ol class="blocks" data-testid="ocr-blocks">
+          @for (b of visibleBlocks(); track $index) {
+            <li class="block-line" dir="auto">{{ b.text }}</li>
+          }
+        </ol>
+      </section>
+
+      @if (ocr()?.englishGloss) {
+        <!-- The document's English gets the same three moves a message
+             translation gets: confirm it, correct it, or send it back for a
+             better one. Certifying a document translation is the same kind of
+             assertion as certifying a message. -->
+        <section class="text-section gloss" [class.reviewed]="!!docReview()">
           <div class="gloss-header">
-            <span class="caption">ENGLISH GLOSS · mock-translate</span>
+            <span class="caption">ENGLISH · {{ glossBadge() }}</span>
+            <span class="spacer"></span>
+            @if (!glossEditing()) {
+              <button
+                class="action-btn"
+                type="button"
+                [title]="docReview() ? 'Clear this verdict' : 'Confirm this translation'"
+                [attr.aria-pressed]="!!docReview()"
+                [class.confirmed]="docReview()?.verdict === 'confirmed'"
+                data-testid="ocr-gloss-confirm"
+                (click)="confirmGloss()"
+              >
+                <mat-icon>check</mat-icon>
+              </button>
+              <button
+                class="action-btn"
+                type="button"
+                title="Correct this translation"
+                [class.edited]="docReview()?.verdict === 'edited'"
+                data-testid="ocr-gloss-edit"
+                (click)="startGlossEdit()"
+              >
+                <mat-icon>edit_note</mat-icon>
+              </button>
+              <button
+                class="action-btn"
+                type="button"
+                title="Re-run through the model gateway"
+                data-testid="ocr-gloss-retranslate"
+                [disabled]="retranslating()"
+                (click)="retranslate()"
+              >
+                @if (retranslating()) {
+                  <mat-spinner class="inline-spinner" diameter="14" strokeWidth="2" />
+                } @else {
+                  <mat-icon>auto_awesome</mat-icon>
+                }
+              </button>
+            }
           </div>
-          <p class="gloss-text" data-testid="ocr-gloss">{{ gloss }}</p>
-        </div>
+
+          @if (glossEditing()) {
+            <!-- The correction is written with the original still on screen
+                 above it: no verdict without the source. -->
+            <textarea
+              class="edit-area"
+              rows="6"
+              data-testid="ocr-gloss-field"
+              [value]="glossDraft()"
+              (input)="glossDraft.set($any($event.target).value)"
+            ></textarea>
+            <div class="edit-actions">
+              <button class="solid-btn" type="button" data-testid="ocr-gloss-save" (click)="saveGlossEdit()">
+                Save translation
+              </button>
+              <button class="text-btn" type="button" (click)="glossEditing.set(false)">Cancel</button>
+            </div>
+          } @else {
+            <p class="gloss-text" data-testid="ocr-gloss">{{ glossText() }}</p>
+          }
+        </section>
       }
     </div>
   </div>

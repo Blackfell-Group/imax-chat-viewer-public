@@ -42,20 +42,22 @@
   height: 96vh;
 }
 
-.ocr-split {
+.ocr-body {
   display: flex;
+  flex-direction: column;
   gap: 0;
   padding: 16px;
-  min-height: 320px;
   flex: 1;
   min-height: 0;
+  overflow: hidden;
 }
 
-// Grab strip between the scan and the extracted text.
+// Grab strip between the scan and the text below it. Horizontal now — the
+// panes stack.
 .split-handle {
   flex: 0 0 10px;
-  margin: 0 3px;
-  cursor: col-resize;
+  margin: 3px 0;
+  cursor: row-resize;
   border-radius: 3px;
   background: transparent;
 
@@ -97,7 +99,7 @@
   display: flex;
   flex-direction: column;
   gap: 6px;
-  min-width: 0;
+  min-height: 0;
 }
 
 // The scan fills whatever room the pane has. It used to be capped at 420px
@@ -137,10 +139,52 @@
 
 .ocr-text {
   flex: 1;
-  min-width: 0;
+  min-height: 0;
   overflow-y: auto;
-  border-left: 1px solid var(--line);
-  padding-left: 16px;
+  border-top: 1px solid var(--line);
+  padding-top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.text-section {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+// The original, one document line per row. Numbered so an officer reading the
+// scan against the text can say which line they mean.
+ol.blocks {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: ocrline;
+
+  .block-line {
+    counter-increment: ocrline;
+    display: flex;
+    gap: 10px;
+    padding: 3px 0;
+    border-bottom: 1px solid color-mix(in srgb, var(--line) 45%, transparent);
+    line-height: 1.6;
+
+    &::before {
+      content: counter(ocrline);
+      flex: 0 0 1.6em;
+      text-align: right;
+      color: var(--text-dim);
+      font-size: 10px;
+      font-variant-numeric: tabular-nums;
+      padding-top: 3px;
+      user-select: none;
+    }
+
+    &:last-child {
+      border-bottom: none;
+    }
+  }
 }
 
 .caption {
@@ -380,4 +424,48 @@
     width: 14px;
     height: 14px;
   }
+}
+
+// The scan scrolls when zoomed past the pane. Anchored top-left rather than
+// centred so a fit-width page starts at the top of the document.
+.ocr-image {
+  align-items: flex-start;
+  justify-content: center;
+}
+
+.gloss-header {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+
+  .spacer { flex: 1; }
+
+  .action-btn.confirmed { color: var(--ok, #4caf7d); }
+  .action-btn.edited { color: var(--warn, #d98a8a); }
+}
+
+// A reviewed gloss carries the same edge the message bubbles use, so the state
+// reads the same way in both places.
+.text-section.gloss.reviewed {
+  border-left: 3px solid var(--ok, #4caf7d);
+  padding-left: 10px;
+}
+
+.edit-area {
+  width: 100%;
+  box-sizing: border-box;
+  resize: vertical;
+  font: inherit;
+  line-height: 1.55;
+  padding: 8px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: var(--paper-dim, #0c1116);
+  color: var(--text);
+}
+
+.edit-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
 }

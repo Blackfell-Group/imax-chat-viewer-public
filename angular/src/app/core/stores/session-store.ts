@@ -27,6 +27,11 @@ export class SessionStore {
   private readonly _notes = signal<Record<string, string>>({});
   private readonly _docNotes = signal<Record<string, string>>({});
   private readonly _docTags = signal<Record<string, DocTagRecord>>({});
+  // A document's English gloss gets the same treatment as a message
+  // translation: it can be confirmed, corrected, and taken back. An officer
+  // citing a document is asserting the translation is right, and that
+  // assertion needs an owner.
+  private readonly _docReviews = signal<Record<string, TranslationReview>>({});
 
   readonly translations = this._translations.asReadonly();
   readonly entities = this._entities.asReadonly();
@@ -34,6 +39,7 @@ export class SessionStore {
   readonly notes = this._notes.asReadonly();
   readonly docNotes = this._docNotes.asReadonly();
   readonly docTags = this._docTags.asReadonly();
+  readonly docReviews = this._docReviews.asReadonly();
 
   // Every custom tag the officer has coined this session, in the order they
   // coined them. Without this the vocabulary was derived per-document, so a
@@ -91,6 +97,15 @@ export class SessionStore {
     this._docNotes.update((all) => {
       const next = { ...all };
       if (note) next[attachmentId] = note;
+      else delete next[attachmentId];
+      return next;
+    });
+  }
+
+  setDocReview(attachmentId: string, review: TranslationReview | null): void {
+    this._docReviews.update((all) => {
+      const next = { ...all };
+      if (review) next[attachmentId] = review;
       else delete next[attachmentId];
       return next;
     });

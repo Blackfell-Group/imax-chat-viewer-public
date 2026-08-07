@@ -1,6 +1,7 @@
 import { Component, computed, effect, inject, input, output, signal, untracked } from '@angular/core';
 import { NgStyle } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { OcrApi } from '../../core/api/ocr-api';
 import { SessionStore } from '../../core/stores/session-store';
 import { Attachment, OcrResponse } from '../../core/models/api.models';
@@ -22,7 +23,7 @@ const QUICK_TAGS = ['priority', 'identity-doc', 'matches-open-case', 'follow-up'
 // document findable back in Search & Triage.
 @Component({
   selector: 'app-ocr-dialog',
-  imports: [MatIconModule, NgStyle],
+  imports: [MatIconModule, MatProgressSpinnerModule, NgStyle],
   templateUrl: './ocr-dialog.html',
   styleUrl: './ocr-dialog.scss',
 })
@@ -45,15 +46,24 @@ export class OcrDialog {
   // exactly what the review reported. All in-memory: no persistence anywhere
   // in this application (TDD Task 3), so geometry resets with the session.
   protected readonly maximized = signal(false);
-  protected readonly widthPx = signal(900);
-  protected readonly heightPx = signal(Math.round(window.innerHeight * 0.88));
+  protected readonly widthPx = signal(Math.min(1180, Math.round(window.innerWidth * 0.92)));
+  protected readonly heightPx = signal(Math.round(window.innerHeight * 0.94));
   /** 'fit' scales to the pane; a number is an explicit zoom factor. */
-  protected readonly zoom = signal<'fit' | number>('fit');
-  /** Image pane's share of the split, 0.25–0.85. */
-  protected readonly splitRatio = signal(0.5);
+  // Opens showing the WHOLE page: the officer orients on the document, then
+  // reads the extracted text below it. Fit-width is one click away and is the
+  // reading posture — on a portrait page it fills the pane and scrolls.
+  protected readonly zoom = signal<'fit' | 'width' | number>('fit');
+  /** Scan's share of the vertical stack, 0.25–0.85. */
+  protected readonly splitRatio = signal(0.55);
 
   protected readonly imageStyle = computed(() => {
     const z = this.zoom();
+    // 'width' is the default because these are portrait pages in a landscape
+    // pane: fitting to the pane HEIGHT leaves most of the width empty and the
+    // document unreadably small, which is what the review reported.
+    if (z === 'width') {
+      return { width: '100%', 'max-width': '100%', 'max-height': 'none', height: 'auto' };
+    }
     return z === 'fit'
       ? { 'max-width': '100%', 'max-height': '100%', width: 'auto', height: 'auto' }
       : { width: `${z * 100}%`, 'max-width': 'none', 'max-height': 'none', height: 'auto' };
@@ -63,7 +73,7 @@ export class OcrDialog {
     this.maximized.update((v) => !v);
   }
 
-  protected setZoom(z: 'fit' | number): void {
+  protected setZoom(z: 'fit' | 'width' | number): void {
     this.zoom.set(z);
   }
 
@@ -93,14 +103,15 @@ export class OcrDialog {
     window.addEventListener('pointerup', up);
   }
 
-  /** Drag the divider between the scan and the extracted text. */
+  /** Drag the divider between the scan and the text beneath it. */
   protected startSplit(event: PointerEvent): void {
     event.preventDefault();
     const split = (e: PointerEvent) => {
-      const host = (event.target as HTMLElement).closest('.ocr-split');
+      const host = (event.target as HTMLElement).closest('.ocr-body');
       if (!host) return;
       const box = host.getBoundingClientRect();
-      this.splitRatio.set(Math.min(Math.max((e.clientX - box.left) / box.width, 0.25), 0.85));
+      // Vertical now that the panes stack: measure Y, not X.
+      this.splitRatio.set(Math.min(Math.max((e.clientY - box.top) / box.height, 0.25), 0.85));
     };
     const up = () => {
       window.removeEventListener('pointermove', split);
@@ -124,7 +135,71 @@ export class OcrDialog {
     this.pageIndex.update((i) => Math.min(Math.max(i + delta, 0), this.pageCount() - 1));
   }
 
+  // Review state for the document's English gloss — the same three moves a
+  // message translation gets, because certifying a document translation is the
+  // same kind of assertion.
+  protected readonly glossEditing = signal(false);
+  protected readonly glossDraft = signal('');
+  protected readonly retranslating = signal(false);
+
   protected readonly attId = computed(() => this.open().attachment.attachmentId);
+  protected readonly docReview = computed(() => this.session.docReviews()[this.attId()]);
+  /** The linguist's version if they have one, otherwise the machine gloss. */
+  protected readonly glossText = computed(
+    () => this.docReview()?.text ?? this.ocr()?.englishGloss ?? '',
+  );
+  protected readonly glossBadge = computed(() => {
+    const r = this.docReview();
+    if (r) return r.verdict === 'edited' ? 'linguist-edited' : 'linguist-confirmed';
+    return this.ocr()?.service ?? 'mock-translate';
+  });
+
+  /** Toggles, like the message verdict. A mis-click is not a decision. */
+  protected confirmGloss(): void {
+    const id = this.attId();
+    const current = this.docReview();
+    if (current?.verdict === 'confirmed') return this.session.setDocReview(id, null);
+    if (current?.verdict === 'edited') {
+      if (!confirm('Clear this verdict? The linguist correction will be discarded.')) return;
+      return this.session.setDocReview(id, null);
+    }
+    const text = this.ocr()?.englishGloss;
+    if (!text) return;
+    this.session.setDocReview(id, { verdict: 'confirmed', text });
+  }
+
+  protected startGlossEdit(): void {
+    this.glossDraft.set(this.glossText());
+    this.glossEditing.set(true);
+  }
+
+  protected saveGlossEdit(): void {
+    this.session.setDocReview(this.attId(), { verdict: 'edited', text: this.glossDraft() });
+    this.glossEditing.set(false);
+  }
+
+  // Send the document back through the enrichment service. Where a model
+  // gateway is configured the service answers from it — the premium tier in
+  // hcd/bilingual_display_model.md — and reports which engine did the work.
+  // Without one it re-reads the fixture, which is honest rather than a lie
+  // about having called something.
+  protected retranslate(): void {
+    if (this.retranslating()) return;
+    this.retranslating.set(true);
+    this.ocrApi.recognize(this.attId()).subscribe({
+      next: (d) => {
+        this.ocr.set(d);
+        // A fresh machine translation supersedes an unedited verdict: the
+        // officer confirmed the OLD text, and silently keeping that verdict on
+        // new text would attribute words to them they never read.
+        if (this.docReview()?.verdict === 'confirmed') {
+          this.session.setDocReview(this.attId(), null);
+        }
+        this.retranslating.set(false);
+      },
+      error: () => this.retranslating.set(false),
+    });
+  }
   protected readonly note = computed(() => this.session.docNotes()[this.attId()]);
   protected readonly tags = computed(() => this.session.docTags()[this.attId()]?.tags ?? []);
 

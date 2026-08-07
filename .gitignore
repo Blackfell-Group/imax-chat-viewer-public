@@ -12,3 +12,9 @@ demo-state.png
 
 # never commit real keys or rasterized fixtures
 .env
+
+# Walkthrough build intermediates. Synthesized narration is cached per voice so
+# a video-only rebuild does not re-bill ElevenLabs; it is a build artifact, not
+# a source, and it is large. scripts/build-walkthrough.sh regenerates it.
+project/acceptance/.audio/
+project/acceptance/.build-*/

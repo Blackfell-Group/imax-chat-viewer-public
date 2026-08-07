@@ -32,9 +32,13 @@ test('the scan viewer maximizes and the image grows with it', async ({ page }) =
   const after = await img.boundingBox();
 
   // The complaint was that the document stayed small however big the viewer
-  // got — the image was capped at 420px independently of the modal.
+  // got, because the image carried a fixed 420px cap. Assert the property
+  // rather than the old number: the scan scales with its pane instead of
+  // stopping at a constant.
   expect(after.height).toBeGreaterThan(before.height);
-  expect(after.height).toBeGreaterThan(420);
+
+  const pane = await dialog.locator('.ocr-image').boundingBox();
+  expect(after.height).toBeGreaterThan(pane.height * 0.85);
 
   const box = await dialog.boundingBox();
   expect(box.width).toBeGreaterThan(page.viewportSize().width * 0.9);

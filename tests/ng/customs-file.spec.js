@@ -38,8 +38,9 @@ test('the customs file opens, pages through all five, and reads RTL', async ({ p
   await expect(blocks).toContainText('MC-4471');
   await expect(page.getByTestId('ocr-page-next')).toBeDisabled();
 
-  // Blocks carry Arabic and must render right-to-left.
-  await expect(blocks.locator('p[dir="auto"]').first()).toBeVisible();
+  // Blocks carry Arabic and must render right-to-left, one line per row.
+  await expect(blocks.locator('li[dir="auto"]').first()).toBeVisible();
+  expect(await blocks.locator('li.block-line').count()).toBeGreaterThan(4);
 });
 
 test('the customs file carries an English gloss covering the whole document', async ({ page }) => {

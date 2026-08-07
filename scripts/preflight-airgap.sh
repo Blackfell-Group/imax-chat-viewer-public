@@ -102,5 +102,31 @@ else
   echo "  clean"
 fi
 
-[[ $status -eq 0 ]] && echo "air-gap preflight: PASS"
+[[ $status -eq 0 ]] && 
+# --- guides in step with each other ----------------------------------------
+# The guides ship in two formats and drifted once already: the Markdown was
+# updated for a build change and the HTML was not, leaving two delivered
+# documents that disagreed about how the product works. TDD 6.1 requires them
+# to be written against the DELIVERED build, so a stale copy is a defect, not
+# untidiness. Compares committed timestamps, not mtimes, which a fresh clone
+# would otherwise fail on.
+echo "==> user and developer guides agree across formats"
+guides_stale=0
+for base in user_guide developer_guide; do
+  md="docs/$base.md"; htm="docs/$base.html"
+  [ -f "$md" ] && [ -f "$htm" ] || continue
+  md_at=$(git log -1 --format=%ct -- "$md" 2>/dev/null || echo 0)
+  htm_at=$(git log -1 --format=%ct -- "$htm" 2>/dev/null || echo 0)
+  if [ "$md_at" -gt "$htm_at" ] 2>/dev/null; then
+    echo "  FAIL: $md was updated after $htm — the HTML guide is behind" >&2
+    guides_stale=1
+  fi
+done
+if [ "$guides_stale" -ne 0 ]; then
+  echo "  update the HTML guide to match, or the package ships two documents that disagree" >&2
+  exit 1
+fi
+echo "  both formats in step"
+
+echo "air-gap preflight: PASS"
 exit $status

@@ -42,7 +42,9 @@ test('OCR viewer: extracted blocks render with engine caption', async ({ page })
   const blocks = page.getByTestId('ocr-blocks');
   await expect(blocks).toContainText('BILL OF LADING');
   await expect(blocks).toContainText('MV Sirte Star');
-  await expect(page.getByText('EXTRACTED TEXT · mock-ocr')).toBeVisible();
+  await expect(page.getByText(/EXTRACTED TEXT — ORIGINAL\s+·\s+mock-ocr/)).toBeVisible();
+  // One document line per row, numbered, so a line can be pointed at.
+  expect(await blocks.locator('li.block-line').count()).toBeGreaterThan(1);
 });
 
 test('thread gold: translate thread, review all, promote — the stack ticks', async ({ page }) => {

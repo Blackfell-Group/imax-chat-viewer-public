@@ -1,0 +1,137 @@
+@if (collapsed()) {
+  <div class="rail rail-right">
+    <button
+      class="icon-btn"
+      type="button"
+      data-testid="goldcopy-expand"
+      [title]="'Expand gold copy (' + store.count() + ')'"
+      (click)="collapsed.set(false)"
+    >
+      <mat-icon>chevron_left</mat-icon>
+    </button>
+    @if (store.count() > 0) {
+      <span class="count-badge">{{ store.count() }}</span>
+    }
+  </div>
+} @else {
+  <div class="panel-body" data-testid="goldcopy-panel">
+    <div
+      appPanelResize="left"
+      tabindex="0"
+      aria-label="Resize the Gold Copy panel"
+      data-testid="goldcopy-resize"
+      [defaultWidth]="280"
+    ></div>
+    <header class="panel-header">
+      <button
+        class="icon-btn"
+        type="button"
+        title="Collapse gold copy panel"
+        (click)="collapsed.set(true)"
+      >
+        <mat-icon>chevron_right</mat-icon>
+      </button>
+      <span class="panel-title">Gold Copy · {{ store.count() }}</span>
+      <button
+        class="text-btn export-btn"
+        type="button"
+        data-testid="export-btn"
+        [disabled]="store.count() === 0"
+        (click)="openExport()"
+      >
+        <mat-icon class="chip-icon">ios_share</mat-icon>
+        Export
+      </button>
+    </header>
+
+    <div class="tray" cdkDropList (cdkDropListDropped)="dropThread($event)" data-testid="gold-tray">
+      @if (store.count() === 0) {
+        <p class="tray-empty">
+          Work your stack: translate, review every message, then promote the thread to
+          gold from the viewer strip. Finished gold copies collect here for export.
+        </p>
+      }
+      @for (g of store.threadGoldList(); track g.threadId) {
+        <div class="clip-card gold" cdkDrag [attr.data-testid]="'thread-gold-' + g.threadId">
+          <div class="clip-header">
+            <!-- The order of these threads is the order of the product, so the
+                 linguist decides it. -->
+            <mat-icon class="drag-handle" cdkDragHandle title="Drag to reorder">drag_indicator</mat-icon>
+            <span class="clip-type gold-type">THREAD GOLD</span>
+            <span class="spacer"></span>
+            <button
+              class="action-btn"
+              type="button"
+              title="Remove thread gold"
+              (click)="store.removeThreadGold(g.threadId)"
+            >
+              <mat-icon>delete_outline</mat-icon>
+            </button>
+          </div>
+          <p class="clip-content gold-title">{{ g.title }}</p>
+          <p class="gold-counts">
+            {{ g.translatedCount }}/{{ g.foreignCount }} translated ·
+            {{ g.reviewedCount }}/{{ g.foreignCount }} reviewed
+          </p>
+          <app-provenance-line [p]="g.provenance" />
+        </div>
+      }
+    </div>
+
+    @if (exportOpen()) {
+      <div
+        class="export-backdrop"
+        role="button"
+        tabindex="0"
+        aria-label="Close export"
+        (click)="exportOpen.set(false)"
+        (keydown.escape)="exportOpen.set(false)"
+      ></div>
+      <div
+        class="export-modal"
+        role="dialog"
+        aria-label="Gold Copy Export"
+        data-testid="export-modal"
+        [class.maximized]="exportMaximized()"
+      >
+        <div class="export-title">
+          <span>Gold Copy Export — Full Translations</span>
+          <span class="spacer"></span>
+          <button
+            class="action-btn"
+            type="button"
+            [title]="exportMaximized() ? 'Restore' : 'Maximize'"
+            data-testid="export-maximize"
+            [attr.aria-pressed]="exportMaximized()"
+            (click)="exportMaximized.set(!exportMaximized())"
+          >
+            <mat-icon>{{ exportMaximized() ? 'close_fullscreen' : 'open_in_full' }}</mat-icon>
+          </button>
+        </div>
+        <!-- A textarea rather than a <pre>: the fallback when the clipboard is
+             unavailable is "select this and copy it yourself", which needs a
+             field that can actually be selected. -->
+        <textarea
+          class="export-body"
+          readonly
+          data-testid="export-text"
+          [value]="exportText()"
+        ></textarea>
+        <div class="export-actions">
+          <button class="text-btn" type="button" data-testid="export-copy" (click)="copyExport()">
+            <mat-icon class="chip-icon">content_copy</mat-icon>
+            Copy
+          </button>
+          <button class="text-btn" type="button" (click)="exportOpen.set(false)">Close</button>
+        </div>
+        <div
+          class="export-grip"
+          role="separator"
+          aria-label="Resize export"
+          data-testid="export-resize"
+          (pointerdown)="startExportResize($event)"
+        ></div>
+      </div>
+    }
+  </div>
+}

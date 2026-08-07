@@ -1,0 +1,15 @@
+# Build context hygiene: images carry only runtime files (target-environment container guidance —
+# exclude docs, source not needed at runtime, and anything proprietary).
+.git
+node_modules
+angular/node_modules
+angular/dist
+angular/.angular
+test-results
+project
+hcd
+tests
+src
+deploy/k8s
+*.md
+demo-state.png

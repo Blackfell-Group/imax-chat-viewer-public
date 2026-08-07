@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="1132" viewBox="0 0 400 566">
+  <rect width="400" height="566" fill="#f6f2e7"/>
+  <rect x="14" y="14" width="372" height="538" fill="none" stroke="#8a7f66" stroke-width="2"/>
+  <text x="360" y="46" text-anchor="start" direction="rtl" font-family="'Noto Naskh Arabic','Noto Sans Arabic','Geeza Pro','Amiri','Scheherazade New',serif" font-size="11" font-weight="normal" fill="#8a7f66">الهيئة العامة للجمارك</text>
+  <text x="360" y="62" text-anchor="start" direction="rtl" font-family="'Noto Naskh Arabic','Noto Sans Arabic','Geeza Pro','Amiri','Scheherazade New',serif" font-size="10" font-weight="normal" fill="#8a7f66">ميناء مصراتة — قسم الوارد</text>
+  <line x1="40" y1="72" x2="360" y2="72" stroke="#8a7f66" stroke-width="1"/>
+  <text x="360" y="98" text-anchor="start" direction="rtl" font-family="'Noto Naskh Arabic','Noto Sans Arabic','Geeza Pro','Amiri','Scheherazade New',serif" font-size="17" font-weight="bold" fill="#3a3428">تقرير التفتيش والإفراج</text>
+  <text x="360" y="118" text-anchor="start" direction="rtl" font-family="'Noto Naskh Arabic','Noto Sans Arabic','Geeza Pro','Amiri','Scheherazade New',serif" font-size="12" font-weight="normal" fill="#6b6250">محضر معاينة رقم INS-2026-0703-77</text>
+  <text x="360" y="158" text-anchor="start" direction="rtl" font-family="'Noto Naskh Arabic','Noto Sans Arabic','Geeza Pro','Amiri','Scheherazade New',serif" font-size="12" font-weight="normal" fill="#3a3428">تم فحص الشحنة بالكامل بتاريخ ٣ يوليو ٢٠٢٦</text>
+  <text x="360" y="182" text-anchor="start" direction="rtl" font-family="'Noto Naskh Arabic','Noto Sans Arabic','Geeza Pro','Amiri','Scheherazade New',serif" font-size="12" font-weight="normal" fill="#3a3428">في الساحة رقم ٧ بميناء مصراتة، بحضور</text>
+  <text x="360" y="206" text-anchor="start" direction="rtl" font-family="'Noto Naskh Arabic','Noto Sans Arabic','Geeza Pro','Amiri','Scheherazade New',serif" font-size="12" font-weight="normal" fill="#3a3428">ممثل المستورد ووكيل الشحن.</text>
+  <text x="360" y="246" text-anchor="start" direction="rtl" font-family="'Noto Naskh Arabic','Noto Sans Arabic','Geeza Pro','Amiri','Scheherazade New',serif" font-size="12" font-weight="bold" fill="#3a3428">نتيجة الفحص:</text>
+  <text x="360" y="270" text-anchor="start" direction="rtl" font-family="'Noto Naskh Arabic','Noto Sans Arabic','Geeza Pro','Amiri','Scheherazade New',serif" font-size="11.5" font-weight="normal" fill="#3a3428">مطابقة للبيان — لا توجد فروقات في العدد</text>
+  <text x="360" y="292" text-anchor="start" direction="rtl" font-family="'Noto Naskh Arabic','Noto Sans Arabic','Geeza Pro','Amiri','Scheherazade New',serif" font-size="11.5" font-weight="normal" fill="#3a3428">أو الوزن. الطرد رقم ١١ به تلف سطحي في</text>
+  <text x="360" y="314" text-anchor="start" direction="rtl" font-family="'Noto Naskh Arabic','Noto Sans Arabic','Geeza Pro','Amiri','Scheherazade New',serif" font-size="11.5" font-weight="normal" fill="#3a3428">الغلاف الخارجي دون أثر على المحتوى.</text>
+  <text x="360" y="354" text-anchor="start" direction="rtl" font-family="'Noto Naskh Arabic','Noto Sans Arabic','Geeza Pro','Amiri','Scheherazade New',serif" font-size="12" font-weight="bold" fill="#3a3428">المفتش:</text>
+  <text x="250" y="354" text-anchor="start" direction="rtl" font-family="'Noto Naskh Arabic','Noto Sans Arabic','Geeza Pro','Amiri','Scheherazade New',serif" font-size="12" font-weight="normal" fill="#3a3428">ع. الزروق</text>
+  <text x="360" y="382" text-anchor="start" direction="rtl" font-family="'Noto Naskh Arabic','Noto Sans Arabic','Geeza Pro','Amiri','Scheherazade New',serif" font-size="12" font-weight="bold" fill="#3a3428">الرقم الوظيفي:</text>
+  <text x="250" y="382" text-anchor="end" direction="ltr" font-family="'Courier New',Courier,monospace" font-size="12" fill="#3a3428">MC-4471</text>
+  <text x="360" y="410" text-anchor="start" direction="rtl" font-family="'Noto Naskh Arabic','Noto Sans Arabic','Geeza Pro','Amiri','Scheherazade New',serif" font-size="12" font-weight="bold" fill="#3a3428">وكيل الشحن:</text>
+  <text x="250" y="410" text-anchor="start" direction="rtl" font-family="'Noto Naskh Arabic','Noto Sans Arabic','Geeza Pro','Amiri','Scheherazade New',serif" font-size="12" font-weight="normal" fill="#3a3428">شركة البحر الأبيض للتخليص</text>
+  <g transform="rotate(-4 150 432)">
+  <text x="150" y="432" text-anchor="middle" direction="rtl" font-family="'Noto Naskh Arabic','Noto Sans Arabic','Geeza Pro','Amiri','Scheherazade New',serif" font-size="13" font-weight="normal" fill="#2a4a7a">أُفرج عن الشحنة</text>
+  </g>
+  <line x1="48" y1="500" x2="170" y2="500" stroke="#8a7f66" stroke-width="0.8"/>
+  <text x="170" y="514" text-anchor="start" direction="rtl" font-family="'Noto Naskh Arabic','Noto Sans Arabic','Geeza Pro','Amiri','Scheherazade New',serif" font-size="9.5" font-weight="normal" fill="#8a7f66">التوقيع</text>
+  <g transform="rotate(6 300 480)">
+  <rect x="252" y="452" width="96" height="46" fill="none" stroke="#7a4d8f" stroke-width="1.6" opacity="0.75"/>
+  <text x="300" y="472" text-anchor="middle" direction="rtl" font-family="'Noto Naskh Arabic','Noto Sans Arabic','Geeza Pro','Amiri','Scheherazade New',serif" font-size="9" font-weight="normal" fill="#7a4d8f">الإفراج الجمركي</text>
+  <text x="300" y="487" text-anchor="middle" direction="ltr" font-family="'Courier New',Courier,monospace" font-size="8" fill="#7a4d8f">03 JUL 2026</text>
+  </g>
+  <line x1="40" y1="520" x2="360" y2="520" stroke="#8a7f66" stroke-width="1"/>
+  <text x="360" y="536" text-anchor="start" direction="rtl" font-family="'Noto Naskh Arabic','Noto Sans Arabic','Geeza Pro','Amiri','Scheherazade New',serif" font-size="9" font-weight="normal" fill="#8a7f66">إقرار جمركي رقم JM-2026-0703-0418</text>
+  <text x="70" y="536" text-anchor="middle" direction="ltr" font-family="'Courier New',Courier,monospace" font-size="9" fill="#8a7f66">5 / 5</text>
+  </svg>

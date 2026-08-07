@@ -1,0 +1,76 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+.app-toolbar {
+  position: relative;
+  flex: 0 0 auto;
+  gap: 12px;
+  height: 48px; // dense variant, matching the reference toolbar
+  background: #101820;
+  border-bottom: 1px solid #263140;
+  color: #e6edf3;
+}
+
+.app-title {
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+.app-subtitle {
+  color: #8b98a5;
+  font-weight: 400;
+}
+
+.unclass-banner {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 2px 12px;
+  border-radius: 16px;
+  background: #e3c000;
+  color: #1a1400;
+  font-size: 0.8125rem;
+  font-weight: 700;
+}
+
+// Signed-in officer, per the authenticating front. Sits right of the banner
+// and stays quiet — it is context, not a control.
+.app-identity {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8125rem;
+  color: var(--text-dim);
+
+  mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+  }
+}
+
+.identity-name {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.identity-org::before {
+  content: '·';
+  margin-right: 6px;
+}
+
+.panels {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+
+  > * {
+    display: flex;
+    min-height: 0;
+  }
+}

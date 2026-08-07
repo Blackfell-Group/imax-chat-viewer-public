@@ -1,0 +1,39 @@
+@use '@angular/material' as mat;
+@use './fonts';
+
+html {
+  color-scheme: dark;
+
+  @include mat.theme((
+    color: mat.$azure-palette,
+    typography: Roboto,
+    density: 0,
+  ));
+}
+
+// Design contract (src/theme.jsx in the reference app): entity-chip colors
+// are part of the evaluated look — consistent everywhere an entity appears
+// (message overlay, chip row, gold-copy tray).
+:root {
+  --bg: #0f1419;
+  --paper: #171d24;
+  --line: #263140;
+  --text: #e6edf3;
+  --text-dim: #8b98a5;
+  --primary: #4da3ff;
+  --secondary: #9a7bff;
+  --entity-person: #ffb547;
+  --entity-geo: #39c5a3;
+  --entity-phone: #b48bff;
+  --entity-passport: #ff6f8e;
+  --entity-handle: #7fd1ff;
+}
+
+body {
+  margin: 0;
+  height: 100vh;
+  background: var(--bg);
+  color: var(--text);
+  font-family: Roboto, 'Noto Sans', 'Noto Sans Arabic', 'Noto Sans SC', sans-serif;
+  font-size: 13px;
+}

@@ -1,0 +1,52 @@
+# Declarative deployment set: `kubectl apply -k deploy/k8s`.
+#
+# Image tags are versioned (never :latest); config changes are a new tag +
+# rollout, never exec-and-edit. The model gateway address and key are supplied
+# at deploy time through the `imax-model-gateway` Secret (model-gateway.yaml).
+#
+# REGISTRY PREFIX (air-gap). The manifests carry bare names — `imax-spa:0.1.0`
+# — which a kubelet resolves against Docker Hub. That is correct on the kind
+# cluster in CI, where the images are side-loaded, and wrong everywhere else:
+# in the enclave there is no route to Docker Hub, so the pods sit in
+# ImagePullBackOff. Point the whole set at the in-enclave registry with the
+# `images:` transform rather than editing six Deployments:
+#
+#   cd deploy/k8s
+#   kustomize edit set image imax-spa=<registry>/imax/imax-spa:1.0.0
+#   ...one per service, or uncomment and fill the block below.
+#
+# See deploy/AIRGAP.md §3.
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - serviceaccount.yaml
+  - model-gateway.yaml
+  - auth.yaml
+  - networkpolicy.yaml
+  - spa.yaml
+  - mock-search.yaml
+  - mock-translation.yaml
+  - mock-entities.yaml
+  - mock-summarize.yaml
+  - mock-ocr.yaml
+
+# images:
+#   - name: imax-spa
+#     newName: <registry>/imax/imax-spa
+#     newTag: "1.0.0"
+#   - name: imax-mock-search
+#     newName: <registry>/imax/imax-mock-search
+#     newTag: "1.0.0"
+#   - name: imax-mock-translation
+#     newName: <registry>/imax/imax-mock-translation
+#     newTag: "1.0.0"
+#   - name: imax-mock-entities
+#     newName: <registry>/imax/imax-mock-entities
+#     newTag: "1.0.0"
+#   - name: imax-mock-summarize
+#     newName: <registry>/imax/imax-mock-summarize
+#     newTag: "1.0.0"
+#   - name: imax-mock-ocr
+#     newName: <registry>/imax/imax-mock-ocr
+#     newTag: "1.0.0"

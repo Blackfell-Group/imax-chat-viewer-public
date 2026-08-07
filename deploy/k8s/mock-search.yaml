@@ -1,0 +1,103 @@
+# imax-mock-search: single-responsibility enrichment pod (routes/search.js).
+# Stateless — seed data baked in; no volumes, no secrets required (see the
+# deployment guide's production-cutover note).
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: imax-mock-search
+  labels:
+    app: imax-mock-search
+    part-of: imax-chat-viewer
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: imax-mock-search
+  template:
+    metadata:
+      labels:
+        app: imax-mock-search
+        part-of: imax-chat-viewer
+    spec:
+      # Named account rather than `default`. Grants nothing here; it is the
+      # identity the tls-awssm overlay attaches an IAM role to. See
+      # serviceaccount.yaml.
+      serviceAccountName: imax
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: imax-mock-search
+          image: imax-mock-search:0.1.0
+          imagePullPolicy: IfNotPresent
+          # Restricted Pod Security Standard. Without these three, an
+          # enforcing namespace rejects the pod outright — the FAQ's "least
+          # privilege within containers" is admission policy, not advice.
+          # runAsUser is deliberately NOT pinned: a namespace that assigns its
+          # own UID range must be free to do so, and both images tolerate an
+          # arbitrary non-root UID.
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: false
+            capabilities:
+              drop: ["ALL"]
+          # Live model gateway (the target environment). Absent or empty ⇒ fixtures.
+          envFrom:
+            - configMapRef:
+                name: imax-model-gateway
+                optional: true
+            - secretRef:
+                name: imax-model-gateway
+                optional: true
+          # Enclave root CA (air-gap). The model gateway presents an
+          # internal-CA certificate; without this, every gateway call fails
+          # TLS verification and looks like a network outage. Optional, so the
+          # default fixture deployment is unaffected — populate with
+          # deploy/enclave-ca.sh.
+          volumeMounts:
+            - name: enclave-ca
+              mountPath: /etc/ssl/enclave
+              readOnly: true
+          ports:
+            - containerPort: 5177
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 5177
+            initialDelaySeconds: 3
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 5177
+            initialDelaySeconds: 2
+            periodSeconds: 5
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 250m
+              memory: 256Mi
+      volumes:
+        - name: enclave-ca
+          configMap:
+            name: imax-enclave-ca
+            optional: true
+---
+# In-cluster only (ClusterIP): the SPA pod is the sole user-facing surface.
+apiVersion: v1
+kind: Service
+metadata:
+  name: imax-mock-search
+  labels:
+    app: imax-mock-search
+    part-of: imax-chat-viewer
+spec:
+  type: ClusterIP
+  selector:
+    app: imax-mock-search
+  ports:
+    - port: 5177
+      targetPort: 5177

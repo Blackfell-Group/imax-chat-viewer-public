@@ -1,0 +1,70 @@
+# Caller identity configuration for the SPA pod.
+#
+# The enclave front (OIDC / mTLS) authenticates the user and forwards identity
+# as request headers. The NAMES of those headers differ between deployments, so
+# they are configuration rather than code — this ConfigMap is the only thing
+# that changes to move between fronts.
+#
+# The defaults below are OpenLake's set. Another site might inject
+# `x-remote-user` / `x-remote-groups`, or SAML-derived names; change the four
+# values, roll the pod, done.
+#
+# SECURITY. In proxy-header mode these headers are trusted absolutely, which is
+# only safe if this pod is unreachable except through the authenticating front.
+# Anyone who can open a socket to it directly can claim any identity by setting
+# a header. Restricting ingress to the front is a target environment-side control (route
+# / ingress / service mesh) that these manifests cannot express — it is a
+# deployment prerequisite, not an optional hardening step. See AIRGAP.md §9.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: imax-auth
+  labels:
+    part-of: imax-chat-viewer
+data:
+  # disabled     — headers parsed and displayed if present, nothing enforced.
+  #                The default, so a fresh `kubectl apply -k` demonstrates
+  #                without a front in place.
+  # proxy-header — identity required, read from the flat headers below;
+  #                requests without it are refused 401.
+  # bearer-jwt   — identity required, read from the CLAIMS of the token the
+  #                front forwards. This is the target environment: oauth2-proxy sends the
+  #                STS identity token in `Authorization` and the access token
+  #                in `x-auth-request-access-token`. The flat headers below are
+  #                ignored in this mode.
+  AUTH_MODE: "disabled"
+
+  # Header names, for proxy-header mode. Swap these, not the code.
+  AUTH_HEADER_ID: "x-ain"
+  AUTH_HEADER_NAME: "x-name"
+  AUTH_HEADER_GROUPS: "x-ismemberof"
+  AUTH_HEADER_ORG: "x-org"
+
+  # ---- bearer-jwt mode ----
+  # Which header carries the identity token. "Bearer <token>" and a bare token
+  # are both accepted.
+  AUTH_HEADER_TOKEN: "authorization"
+  # The caller's access token. Read and attached to the request, but NOT used:
+  # the model gateway authenticates with its own MODEL_API_KEY, not as the end
+  # user. Here so the plumbing exists if that ever changes.
+  AUTH_HEADER_ACCESS_TOKEN: "x-auth-request-access-token"
+  #
+  # Claim names. These are the common OIDC spellings, NOT confirmed against the
+  # Sponsor's STS — every deployment publishes its own. If bearer-jwt mode 401s
+  # against a real token, GET /api/whoami: it reports the claim names the token
+  # actually carried next to the four configured here, which is the whole
+  # diagnosis. Correcting it is an edit to this file plus a rollout restart.
+  AUTH_CLAIM_ID: "sub"
+  AUTH_CLAIM_NAME: "name"
+  AUTH_CLAIM_GROUPS: "groups"
+  AUTH_CLAIM_ORG: "org"
+
+  # Characters that separate group values. Applies to the groups HEADER in
+  # proxy-header mode, and to the groups CLAIM in bearer-jwt mode when it
+  # arrives as a string rather than a JSON array (both are accepted).
+  AUTH_GROUP_SEPARATOR: ",;"
+
+  # Optional authorization gate: comma-separated, caller must hold ANY one.
+  # Empty ⇒ authentication only, no group check. Works identically in both
+  # enforcing modes.
+  AUTH_REQUIRED_GROUPS: ""

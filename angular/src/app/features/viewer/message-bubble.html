@@ -1,0 +1,173 @@
+<div
+  class="bubble"
+  [class.foreign]="msg().lang !== 'en'"
+  [class.flash]="highlighted()"
+  [class.reviewed-confirmed]="review()?.verdict === 'confirmed'"
+  [class.reviewed-edited]="review()?.verdict === 'edited'"
+  [class.needs-review]="hasEn() && !review()"
+  [attr.data-testid]="'msg-' + msg().messageId"
+>
+  <div class="bubble-header">
+    <span class="sender">{{ msg().sender.handle }}</span>
+    <span class="ts">{{ timestamp(msg().ts) }}</span>
+    <span class="meta-chip outlined">{{ msg().lang.toUpperCase() }}</span>
+    @if (hasEn()) {
+      <span
+        class="meta-chip translated-badge"
+        [class.reviewed]="review()"
+        [attr.data-testid]="'translated-' + msg().messageId"
+        >{{ translatedBadge() }}</span
+      >
+    }
+    <span class="spacer"></span>
+    @if (hasEn() && !editing()) {
+      <button
+        class="action-btn"
+        type="button"
+        [title]="review() ? 'Clear this verdict' : 'Confirm this translation'"
+        [attr.aria-pressed]="!!review()"
+        [class.confirmed]="review()?.verdict === 'confirmed'"
+        [attr.data-testid]="'confirm-' + msg().messageId"
+        (click)="confirmTranslation()"
+      >
+        <mat-icon>check</mat-icon>
+      </button>
+      <button
+        class="action-btn"
+        type="button"
+        title="Correct this translation"
+        [class.edited]="review()?.verdict === 'edited'"
+        [attr.data-testid]="'edit-tr-' + msg().messageId"
+        (click)="startEdit()"
+      >
+        <mat-icon>edit_note</mat-icon>
+      </button>
+    }
+    <button
+      class="action-btn"
+      type="button"
+      [title]="note() ? 'Edit note' : 'Add note'"
+      [class.has-note]="note()"
+      [attr.data-testid]="'note-' + msg().messageId"
+      (click)="toggleNoteEditor()"
+    >
+      <mat-icon>comment</mat-icon>
+    </button>
+  </div>
+
+  @if (editing()) {
+    <div class="edit-block">
+      <!-- No verdict without the source: the correction is written against
+           the original, not from memory (hcd/bilingual_display_model.md). -->
+      <p
+        class="original-text"
+        [attr.dir]="msg().dir"
+        [class.rtl]="msg().dir === 'rtl'"
+        [attr.data-testid]="'original-' + msg().messageId"
+      >{{ msg().text }}</p>
+      <textarea
+        class="edit-area"
+        rows="3"
+        [attr.data-testid]="'edit-field-' + msg().messageId"
+        [value]="draft()"
+        (input)="draft.set($any($event.target).value)"
+      ></textarea>
+      <div class="edit-actions">
+        <button
+          class="solid-btn"
+          type="button"
+          [attr.data-testid]="'save-tr-' + msg().messageId"
+          (click)="saveEdit()"
+        >
+          Save correction
+        </button>
+        <button class="text-btn" type="button" (click)="editing.set(false)">Cancel</button>
+      </div>
+    </div>
+  } @else {
+    <p class="body-text" [attr.dir]="displayDir()" [class.rtl]="displayDir() === 'rtl'">{{ displayText() }}</p>
+    @if (hasEn()) {
+      <!-- Bilingual view: the English leads for readers; the source stays on
+           screen for the judge (hcd/bilingual_display_model.md). -->
+      <p
+        class="original-text"
+        [attr.dir]="msg().dir"
+        [class.rtl]="msg().dir === 'rtl'"
+        [attr.data-testid]="'original-' + msg().messageId"
+      >{{ msg().text }}</p>
+    }
+  }
+
+  @if (msg().attachments?.length) {
+    <div class="attachment-row">
+      @for (a of msg().attachments; track a.attachmentId) {
+        <button
+          class="attachment-chip"
+          type="button"
+          [attr.data-testid]="'attachment-' + a.attachmentId"
+          (click)="openOcr(a)"
+        >
+          <mat-icon class="chip-icon">image</mat-icon>
+          {{ a.name }}
+        </button>
+      }
+    </div>
+  }
+
+  @if (entities(); as ents) {
+    <!-- Entities arrive once per thread (workflow strip) and render as
+         display — spotting aids for the linguist, not clip actions. -->
+    <div class="entity-row" [attr.data-testid]="'entity-row-' + msg().messageId">
+      @if (ents.length === 0) {
+        <span class="no-entities">no entities detected</span>
+      }
+      @for (e of ents; track $index) {
+        <span
+          class="entity-chip-btn"
+          [style.--chip-color]="'var(--entity-' + e.type + ')'"
+          [title]="e.type + ' · confidence ' + e.confidence"
+          [attr.data-testid]="'entity-chip-' + msg().messageId + '-' + $index"
+        >
+          {{ e.type }}: {{ e.text }}
+        </span>
+      }
+    </div>
+  }
+
+  @if (noteEditing()) {
+    <div class="edit-block">
+      <textarea
+        class="edit-area"
+        rows="3"
+        placeholder="Officer interpretation — code words, source correlation, context the MT can't capture…"
+        [attr.data-testid]="'note-field-' + msg().messageId"
+        [value]="noteDraft()"
+        (input)="noteDraft.set($any($event.target).value)"
+      ></textarea>
+      <div class="edit-actions">
+        <button
+          class="solid-btn"
+          type="button"
+          [attr.data-testid]="'save-note-' + msg().messageId"
+          (click)="saveNote()"
+        >
+          Save note
+        </button>
+        <button class="text-btn" type="button" (click)="noteEditing.set(false)">Cancel</button>
+        @if (note()) {
+          <button class="text-btn danger" type="button" (click)="deleteNote()">Delete</button>
+        }
+      </div>
+    </div>
+  }
+
+  @if (note() && !noteEditing()) {
+    <div class="note-display" [attr.data-testid]="'note-display-' + msg().messageId">
+      <div class="note-header">
+        <mat-icon class="note-icon">comment</mat-icon>
+        <span class="note-label">NOTE</span>
+      </div>
+      <p class="note-text">{{ note() }}</p>
+    </div>
+  }
+</div>

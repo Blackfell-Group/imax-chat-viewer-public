@@ -1,0 +1,57 @@
+# Live model gateway configuration — the one thing to set when deploying to
+# the target enclave. The enrichment pods read these at runtime; unset, they
+# answer from their fixtures. No code change, no image rebuild.
+#
+# THREE values switch it on, and all three are required. Two are here; only
+# the key is a secret:
+#
+#   kubectl patch configmap imax-model-gateway --type=merge -p '{"data":{
+#     "MODEL_ENDPOINT":"<gateway base URL, e.g. https://host/v1>",
+#     "MODEL_NAME":"<a model the gateway publishes>"}}'
+#   kubectl create secret generic imax-model-gateway \
+#     --from-literal=MODEL_API_KEY='<key>'
+#   kubectl rollout restart deploy -l part-of=imax-chat-viewer
+#
+# The endpoint lives here rather than in the Secret because a URL is not a
+# credential: in the Secret it could not be read with `kubectl get`, could not
+# be diffed, and correcting a typo in the host meant recreating the whole
+# Secret. The committed value stays empty, so no gateway address enters this
+# repository — scripts/preflight-airgap.sh fails the build if one ever does.
+#
+# MODEL_ENDPOINT must be the base URL INCLUDING the version path
+# (https://host/v1). providers/model-gateway.js appends /chat/completions, so
+# an endpoint that already carries the suffix 404s in a way that reads like a
+# gateway outage.
+#
+# Provenance follows the configuration: a translation produced by the gateway
+# is labelled `<gateway-host>:<model>` in the gold copy, so an officer can
+# always see which engine answered. A malformed endpoint therefore corrupts
+# the gold copy's audit trail, not just the request.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: imax-model-gateway
+  labels:
+    part-of: imax-chat-viewer
+data:
+  # Empty ⇒ fixtures. Never commit a live enclave address here.
+  MODEL_ENDPOINT: ""
+  # Deliberately not a real model name. The Sponsor's gateway publishes its own
+  # inventory and will not have heard of a commercial one, so an unset
+  # deployment should fail with "no such model" rather than quietly asking for
+  # something that happens to exist somewhere else.
+  MODEL_NAME: "SET-ME"
+  MODEL_TIMEOUT_MS: "20000"
+---
+# Placeholder so `kubectl apply -k` succeeds before the real Secret exists.
+# Replace with the command above (or a sealed/external secret) at deploy
+# time — never commit a live key.
+apiVersion: v1
+kind: Secret
+metadata:
+  name: imax-model-gateway
+  labels:
+    part-of: imax-chat-viewer
+type: Opaque
+stringData:
+  MODEL_API_KEY: ""

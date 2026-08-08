@@ -1,0 +1,110 @@
+{
+  "date": "2026-08-08",
+  "video": "walkthrough-2026-08-08.webm",
+  "totalMs": 246057,
+  "pace": 2.6,
+  "cues": [
+    {
+      "id": "01_opening",
+      "at": 0,
+      "segment": "1",
+      "line": "Opening — workspace and the UNCLASS banner"
+    },
+    {
+      "id": "02_bilingual",
+      "at": 17667,
+      "segment": "2b",
+      "line": "Arabic thread opens bilingual, source stays on screen"
+    },
+    {
+      "id": "03_correction",
+      "at": 31295,
+      "segment": "2b",
+      "line": "Correction written against the source; verdict badge changes"
+    },
+    {
+      "id": "04_bench",
+      "at": 44363,
+      "segment": "2c",
+      "line": "Find tools collapse to leave the stack"
+    },
+    {
+      "id": "05_disposition",
+      "at": 52044,
+      "segment": "2c",
+      "line": "Disposition from the viewer strip, where the thread was read"
+    },
+    {
+      "id": "06_facet",
+      "at": 64092,
+      "segment": "3a",
+      "line": "Facet narrows the queue by what a thread contains"
+    },
+    {
+      "id": "07_search",
+      "at": 80133,
+      "segment": "3a",
+      "line": "Native-script query across four languages"
+    },
+    {
+      "id": "08_evidence",
+      "at": 89162,
+      "segment": "3a",
+      "line": "Hit lands on the evidence and flashes"
+    },
+    {
+      "id": "09_stream",
+      "at": 98470,
+      "segment": "3b",
+      "line": "Windowed stream; sort order is reversible"
+    },
+    {
+      "id": "10_enrichment",
+      "at": 115906,
+      "segment": "3b",
+      "line": "Thread-level enrichment and the on-demand summary"
+    },
+    {
+      "id": "11_document",
+      "at": 131304,
+      "segment": "3c",
+      "line": "Five-page Arabic customs declaration"
+    },
+    {
+      "id": "12_maximize",
+      "at": 139451,
+      "segment": "3c",
+      "line": "Maximize — a scan you cannot read is a scan you cannot exploit"
+    },
+    {
+      "id": "13_paging",
+      "at": 153030,
+      "segment": "3c",
+      "line": "Page through the manifest; zoom the table"
+    },
+    {
+      "id": "14_tagging",
+      "at": 170539,
+      "segment": "3c",
+      "line": "Officer's triage mark becomes a searchable facet"
+    },
+    {
+      "id": "15_promote",
+      "at": 184671,
+      "segment": "3d",
+      "line": "Review the thread through and promote it to gold"
+    },
+    {
+      "id": "16_export",
+      "at": 195325,
+      "segment": "3d",
+      "line": "Export the full verdicted transcript; copy confirms"
+    },
+    {
+      "id": "17_close",
+      "at": 215155,
+      "segment": "4",
+      "line": "Close"
+    }
+  ]
+}

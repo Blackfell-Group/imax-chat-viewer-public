@@ -1,0 +1,56 @@
+IMAX Triage Workspace — {{ .Chart.AppVersion }}
+
+  kubectl rollout status deploy -l part-of=imax-chat-viewer
+  kubectl port-forward svc/imax-spa {{ .Values.spa.port }}:{{ .Values.spa.port }}
+
+{{- if .Values.tls.enabled }}
+  curl -sf --cacert <ca>.pem https://localhost:{{ .Values.spa.port }}/healthz
+{{- else }}
+  curl -sf http://localhost:{{ .Values.spa.port }}/healthz
+{{- end }}
+
+Posture:
+{{- if not .Values.tls.enabled }}
+  TLS       off — plaintext behind a terminating front
+{{- else if eq .Values.tls.source "secret" }}
+  TLS       on, from Secret "{{ .Values.tls.secret.name }}" (must exist, or the rollout stops)
+{{- else }}
+  TLS       on, from AWS Secrets Manager at pod start
+    {{- if not .Values.tls.awssm.endpoint }}
+  !! tls.awssm.endpoint is unset — every pod will hold in Init:Error
+    {{- end }}
+    {{- if not .Values.tls.awssm.certSecret }}
+  !! tls.awssm.certSecret is unset — every pod will hold in Init:Error
+    {{- end }}
+    {{- if not .Values.serviceAccount.roleArn }}
+  -- serviceAccount.roleArn unset: credentials fall back to the node instance
+     profile. Fine if the nodes carry the permission; otherwise set it.
+    {{- end }}
+{{- end }}
+  auth      {{ .Values.auth.mode }}
+{{- if eq .Values.auth.mode "bearer-jwt" }}
+     Reading claim "{{ .Values.auth.claimId }}" from header "{{ .Values.auth.headerToken }}".
+     Signatures are NOT verified — the front is trusted. See AIRGAP.md §9.
+     If it 401s against a real token, GET /api/whoami reports which claim names
+     the token actually carried. Correcting it is a values change, not a rebuild.
+{{- end }}
+{{- if .Values.modelGateway.endpoint }}
+  gateway   {{ .Values.modelGateway.name }}
+  {{- if eq .Values.modelGateway.name "SET-ME" }}
+  !! modelGateway.name is still the placeholder — the gateway will 404
+  {{- end }}
+{{- else }}
+  gateway   off — enrichment answers from fixtures (sanctioned; the pods log it)
+{{- end }}
+{{- if not .Values.image.registry }}
+
+  !! image.registry is empty, so images resolve as bare names against Docker Hub.
+     Correct on a local kind cluster, wrong anywhere without egress — the pods
+     will sit in ImagePullBackOff. See AIRGAP.md §3.
+{{- end }}
+{{- if not .Values.ingress.enabled }}
+
+  No Ingress. Reaching this from outside the cluster is the platform's job:
+  set ingress.enabled and let the ingress controller terminate TLS and route
+  to svc/imax-spa. This application ships no proxy of its own.
+{{- end }}

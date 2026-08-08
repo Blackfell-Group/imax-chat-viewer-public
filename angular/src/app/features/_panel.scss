@@ -1,0 +1,75 @@
+// Shared panel building blocks: collapse rails, headers, placeholders.
+// Mixed into each feature panel's stylesheet.
+
+.rail {
+  width: 40px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 8px;
+  background: var(--paper);
+}
+
+.icon-btn {
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--text);
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+
+  &:hover {
+    background: rgb(255 255 255 / 8%);
+  }
+}
+
+.panel-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+
+  .panel-title {
+    flex: 1;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--text-dim);
+  }
+}
+
+.panel-placeholder {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  color: var(--text-dim);
+  font-size: 12px;
+  text-align: center;
+}
+
+// Drag strip for resizing a side panel. Sits inside .panel-body against the
+// edge that faces the workspace, so it reads as part of the seam rather than a
+// control floating in the layout.
+.panel-resize-handle {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 6px;
+  z-index: 3;
+  cursor: col-resize;
+
+  &:hover,
+  &:focus-visible,
+  &:active {
+    background: var(--primary);
+    opacity: 0.55;
+    outline: none;
+  }
+}

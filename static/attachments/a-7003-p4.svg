@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="1132" viewBox="0 0 400 566">
+  <rect width="400" height="566" fill="#f6f2e7"/>
+  <rect x="14" y="14" width="372" height="538" fill="none" stroke="#8a7f66" stroke-width="2"/>
+  <text x="360" y="46" text-anchor="start" direction="rtl" font-family="'Noto Naskh Arabic','Noto Sans Arabic','Geeza Pro','Amiri','Scheherazade New',serif" font-size="11" font-weight="normal" fill="#8a7f66">الهيئة العامة للجمارك</text>
+  <text x="360" y="62" text-anchor="start" direction="rtl" font-family="'Noto Naskh Arabic','Noto Sans Arabic','Geeza Pro','Amiri','Scheherazade New',serif" font-size="10" font-weight="normal" fill="#8a7f66">ميناء مصراتة — قسم الوارد</text>
+  <line x1="40" y1="72" x2="360" y2="72" stroke="#8a7f66" stroke-width="1"/>
+  <text x="360" y="98" text-anchor="start" direction="rtl" font-family="'Noto Naskh Arabic','Noto Sans Arabic','Geeza Pro','Amiri','Scheherazade New',serif" font-size="17" font-weight="bold" fill="#3a3428">الرسوم والضرائب المستحقة</text>
+  <text x="360" y="118" text-anchor="start" direction="rtl" font-family="'Noto Naskh Arabic','Noto Sans Arabic','Geeza Pro','Amiri','Scheherazade New',serif" font-size="12" font-weight="normal" fill="#6b6250">كشف حساب رقم RC-2026-0703-2291</text>
+  <text x="360" y="170" text-anchor="start" direction="rtl" font-family="'Noto Naskh Arabic','Noto Sans Arabic','Geeza Pro','Amiri','Scheherazade New',serif" font-size="12" font-weight="normal" fill="#3a3428">القيمة المصرح بها</text>
+  <text x="150" y="170" text-anchor="start" direction="rtl" font-family="'Noto Naskh Arabic','Noto Sans Arabic','Geeza Pro','Amiri','Scheherazade New',serif" font-size="12" font-weight="normal" fill="#3a3428">٤٨٢٬٠٠٠ د.ل</text>
+  <line x1="40" y1="178" x2="360" y2="178" stroke="#8a7f66" stroke-width="0.6" opacity="0.6"/>
+  <text x="360" y="202" text-anchor="start" direction="rtl" font-family="'Noto Naskh Arabic','Noto Sans Arabic','Geeza Pro','Amiri','Scheherazade New',serif" font-size="12" font-weight="normal" fill="#3a3428">رسم جمركي (٥٪)</text>
+  <text x="150" y="202" text-anchor="start" direction="rtl" font-family="'Noto Naskh Arabic','Noto Sans Arabic','Geeza Pro','Amiri','Scheherazade New',serif" font-size="12" font-weight="normal" fill="#3a3428">٢٤٬١٠٠ د.ل</text>
+  <line x1="40" y1="210" x2="360" y2="210" stroke="#8a7f66" stroke-width="0.6" opacity="0.6"/>
+  <text x="360" y="234" text-anchor="start" direction="rtl" font-family="'Noto Naskh Arabic','Noto Sans Arabic','Geeza Pro','Amiri','Scheherazade New',serif" font-size="12" font-weight="normal" fill="#3a3428">ضريبة القيمة المضافة</text>
+  <text x="150" y="234" text-anchor="start" direction="rtl" font-family="'Noto Naskh Arabic','Noto Sans Arabic','Geeza Pro','Amiri','Scheherazade New',serif" font-size="12" font-weight="normal" fill="#3a3428">١٩٬٢٨٠ د.ل</text>
+  <line x1="40" y1="242" x2="360" y2="242" stroke="#8a7f66" stroke-width="0.6" opacity="0.6"/>
+  <text x="360" y="266" text-anchor="start" direction="rtl" font-family="'Noto Naskh Arabic','Noto Sans Arabic','Geeza Pro','Amiri','Scheherazade New',serif" font-size="12" font-weight="normal" fill="#3a3428">رسوم المناولة والتفريغ</text>
+  <text x="150" y="266" text-anchor="start" direction="rtl" font-family="'Noto Naskh Arabic','Noto Sans Arabic','Geeza Pro','Amiri','Scheherazade New',serif" font-size="12" font-weight="normal" fill="#3a3428">٦٬٧٥٠ د.ل</text>
+  <line x1="40" y1="274" x2="360" y2="274" stroke="#8a7f66" stroke-width="0.6" opacity="0.6"/>
+  <text x="360" y="298" text-anchor="start" direction="rtl" font-family="'Noto Naskh Arabic','Noto Sans Arabic','Geeza Pro','Amiri','Scheherazade New',serif" font-size="12" font-weight="normal" fill="#3a3428">رسم الخدمات الميناء</text>
+  <text x="150" y="298" text-anchor="start" direction="rtl" font-family="'Noto Naskh Arabic','Noto Sans Arabic','Geeza Pro','Amiri','Scheherazade New',serif" font-size="12" font-weight="normal" fill="#3a3428">٢٬٤٠٠ د.ل</text>
+  <line x1="40" y1="306" x2="360" y2="306" stroke="#8a7f66" stroke-width="0.6" opacity="0.6"/>
+  <rect x="40" y="332" width="320" height="26" fill="#e6dfcd"/>
+  <text x="360" y="350" text-anchor="start" direction="rtl" font-family="'Noto Naskh Arabic','Noto Sans Arabic','Geeza Pro','Amiri','Scheherazade New',serif" font-size="13" font-weight="bold" fill="#3a3428">الإجمالي المستحق</text>
+  <text x="150" y="350" text-anchor="start" direction="rtl" font-family="'Noto Naskh Arabic','Noto Sans Arabic','Geeza Pro','Amiri','Scheherazade New',serif" font-size="13" font-weight="bold" fill="#3a3428">٥٥٤٬٥٣٠ د.ل</text>
+  <text x="360" y="400" text-anchor="start" direction="rtl" font-family="'Noto Naskh Arabic','Noto Sans Arabic','Geeza Pro','Amiri','Scheherazade New',serif" font-size="12" font-weight="bold" fill="#3a3428">رقم الإيصال:</text>
+  <text x="250" y="400" text-anchor="end" direction="ltr" font-family="'Courier New',Courier,monospace" font-size="12" fill="#3a3428">RC-2026-0703-2291</text>
+  <text x="360" y="428" text-anchor="start" direction="rtl" font-family="'Noto Naskh Arabic','Noto Sans Arabic','Geeza Pro','Amiri','Scheherazade New',serif" font-size="12" font-weight="bold" fill="#3a3428">طريقة الدفع:</text>
+  <text x="250" y="428" text-anchor="start" direction="rtl" font-family="'Noto Naskh Arabic','Noto Sans Arabic','Geeza Pro','Amiri','Scheherazade New',serif" font-size="12" font-weight="normal" fill="#3a3428">حوالة مصرفية</text>
+  <text x="360" y="456" text-anchor="start" direction="rtl" font-family="'Noto Naskh Arabic','Noto Sans Arabic','Geeza Pro','Amiri','Scheherazade New',serif" font-size="12" font-weight="bold" fill="#3a3428">المصرف:</text>
+  <text x="250" y="456" text-anchor="start" direction="rtl" font-family="'Noto Naskh Arabic','Noto Sans Arabic','Geeza Pro','Amiri','Scheherazade New',serif" font-size="12" font-weight="normal" fill="#3a3428">مصرف الوحدة — فرع مصراتة</text>
+  <text x="360" y="496" text-anchor="start" direction="rtl" font-family="'Noto Naskh Arabic','Noto Sans Arabic','Geeza Pro','Amiri','Scheherazade New',serif" font-size="12" font-weight="bold" fill="#2f6b3d">حالة السداد: مسدّد بالكامل</text>
+  <line x1="40" y1="520" x2="360" y2="520" stroke="#8a7f66" stroke-width="1"/>
+  <text x="360" y="536" text-anchor="start" direction="rtl" font-family="'Noto Naskh Arabic','Noto Sans Arabic','Geeza Pro','Amiri','Scheherazade New',serif" font-size="9" font-weight="normal" fill="#8a7f66">إقرار جمركي رقم JM-2026-0703-0418</text>
+  <text x="70" y="536" text-anchor="middle" direction="ltr" font-family="'Courier New',Courier,monospace" font-size="9" fill="#8a7f66">4 / 5</text>
+  </svg>

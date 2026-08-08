@@ -1,0 +1,257 @@
+@use '../panel' as *;
+
+:host {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.viewer {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+}
+
+.viewer-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-bottom: 1px solid var(--line);
+
+  .thread-id {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .thread-title {
+    font-size: 13px;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .thread-meta {
+    color: var(--text-dim);
+    font-size: 11px;
+  }
+}
+
+.header-btn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--primary);
+  font-size: 11px;
+  text-transform: uppercase;
+  flex-shrink: 0;
+
+  &:disabled {
+    color: var(--text-dim);
+    opacity: 0.5;
+    cursor: default;
+    text-decoration: none;
+  }
+
+  &.promote:not(:disabled) {
+    color: var(--entity-person);
+  }
+
+  &.strip-flagged {
+    color: var(--entity-passport);
+  }
+
+  &.strip-discarded {
+    color: #f44336;
+  }
+}
+
+// [31 Jul amendment] The linguist's whole-thread workflow strip: gold-ready
+// meter left, batch actions right.
+.gold-strip {
+  display: flex;
+  flex-wrap: wrap; // narrow center panes: actions wrap under the meter
+  align-items: center;
+  gap: 4px 8px;
+  padding: 4px 16px;
+  border-bottom: 1px solid var(--line);
+  background: #121a23;
+
+  .spacer {
+    flex: 1;
+  }
+}
+
+.gold-meter {
+  flex-shrink: 0;
+  color: var(--text-dim);
+  font-size: 10px;
+  padding: 2px 8px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+
+  &.ready {
+    color: #10151b;
+    background: var(--entity-person);
+    border-color: var(--entity-person);
+    font-weight: 700;
+  }
+}
+
+.text-btn {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.chip-icon {
+  font-size: 15px;
+  width: 15px;
+  height: 15px;
+}
+
+.summary-widget {
+  margin: 12px 16px 0;
+  padding: 12px;
+  border: 1px solid #2e4a6b;
+  border-radius: 4px;
+  background: #16222f;
+}
+
+.summary-header {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 4px;
+
+  .summary-title {
+    flex: 1;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--primary);
+  }
+}
+
+.icon-btn.small mat-icon {
+  font-size: 14px;
+  width: 14px;
+  height: 14px;
+}
+
+.summary-text {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+// Sort control and message count, above the stream.
+.stream-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 16px;
+  border-bottom: 1px solid var(--line);
+}
+
+.stream-count {
+  font-size: 11px;
+  color: var(--text-dim);
+  letter-spacing: 0.3px;
+}
+
+// cdk-virtual-scroll-viewport owns the scrolling, so the padding moves to the
+// content wrapper it injects — padding on the viewport itself offsets every
+// item transform and the last bubble ends up clipped.
+.stream {
+  flex: 1;
+  min-height: 0;
+  contain: strict;
+
+  ::ng-deep .cdk-virtual-scroll-content-wrapper {
+    padding: 16px;
+    box-sizing: border-box;
+    width: 100%;
+  }
+}
+
+// Spinner standing in for the leading icon while a call is in flight.
+.inline-spinner {
+  display: inline-block;
+  flex: 0 0 auto;
+  margin-right: 2px;
+
+  ::ng-deep circle {
+    stroke: currentColor;
+  }
+}
+
+.empty-state {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-dim);
+  font-size: 13px;
+}
+
+// Conversation-level note. Deliberately styled as a banner above the stream
+// rather than as another bubble: it is a judgement ABOUT the exchange, and a
+// bubble would read as part of it.
+.thread-note,
+.thread-note-editor {
+  margin: 8px 12px 0;
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--accent, #c8a951);
+  border-radius: 4px;
+  background: var(--paper-dim, #0c1116);
+}
+
+.thread-note-label {
+  display: block;
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  color: var(--text-dim);
+}
+
+.thread-note-text {
+  margin: 4px 0 0;
+  font-size: 13px;
+  line-height: 1.45;
+  white-space: pre-wrap;
+}
+
+.thread-note-field {
+  box-sizing: border-box;
+  width: 100%;
+  margin-top: 4px;
+  padding: 8px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: var(--paper);
+  color: var(--text);
+  font: inherit;
+  font-size: 13px;
+  resize: vertical;
+}
+
+.thread-note-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  margin-top: 6px;
+}
+
+.header-btn.has-note {
+  color: var(--accent, #c8a951);
+}

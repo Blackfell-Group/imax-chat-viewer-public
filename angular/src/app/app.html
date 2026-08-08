@@ -1,0 +1,18 @@
+<mat-toolbar class="app-toolbar">
+  <span class="app-title">IMAX <span class="app-subtitle">· Triage Workspace</span></span>
+  <span class="unclass-banner" data-testid="unclass-banner">UNCLASSIFIED — DEMONSTRATION DATA (FABRICATED)</span>
+  @if (identity.known()) {
+    <span class="app-identity" data-testid="identity">
+      <mat-icon aria-hidden="true">badge</mat-icon>
+      <span class="identity-name">{{ identity.label() }}</span>
+      @if (identity.org(); as org) {
+        <span class="identity-org">{{ org }}</span>
+      }
+    </span>
+  }
+</mat-toolbar>
+<main class="panels">
+  <app-triage-panel />
+  <app-chat-viewer />
+  <app-gold-copy-panel />
+</main>

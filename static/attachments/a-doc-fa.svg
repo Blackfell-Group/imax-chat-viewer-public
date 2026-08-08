@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="760" height="760" viewBox="0 0 380 380">
+  <rect width="380" height="380" fill="#eef2ee"/>
+  <rect x="14" y="14" width="352" height="352" fill="none" stroke="#6f7d6a" stroke-width="2"/>
+  <text x="340" y="58" text-anchor="start" direction="rtl" font-family="'Noto Naskh Arabic','Noto Sans Arabic','Geeza Pro','Amiri','Scheherazade New',serif" font-size="21" font-weight="bold" fill="#2f382c">گزارش عبور از مرز</text>
+  <line x1="40" y1="74" x2="340" y2="74" stroke="#6f7d6a" stroke-width="1"/>
+  <g font-family="'Noto Naskh Arabic','Noto Sans Arabic','Geeza Pro','Amiri','Scheherazade New',serif" font-size="15" fill="#37402f" text-anchor="start" direction="rtl">
+    <text x="340" y="110">نام راننده: رضا توکلی</text>
+    <text x="340" y="144">شماره گذرنامه: IR4420117</text>
+    <text x="340" y="178">مرز: دوغارون</text>
+    <text x="340" y="212">مبدأ: مشهد</text>
+    <text x="340" y="246">مقصد: هرات</text>
+    <text x="340" y="280">وسیله نقلیه: کامیون باری</text>
+    <text x="340" y="314">تاریخ: ۹ تیر ۱۴۰۵</text>
+  </g>
+  <rect x="46" y="300" width="96" height="42" fill="none" stroke="#3d6b8f" stroke-width="1.5" opacity="0.7"/>
+  <text x="94" y="326" text-anchor="middle" font-family="'Noto Naskh Arabic','Noto Sans Arabic','Geeza Pro','Amiri','Scheherazade New',serif" font-size="11" fill="#3d6b8f" opacity="0.8">مهر گمرک</text>
+</svg>

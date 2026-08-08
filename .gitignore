@@ -1,0 +1,24 @@
+node_modules/
+dist/
+# Build output of deploy/make-offline-bundle.sh — a 55 MB image bundle plus the
+# source archive. Rebuildable, and larger than the repository.
+dist-bundle/
+test-results/
+playwright-report/
+.gstack/
+demo-state.png
+*.log
+.DS_Store
+
+# never commit real keys or rasterized fixtures
+.env
+
+# Walkthrough build intermediates. Synthesized narration is cached per voice so
+# a video-only rebuild does not re-bill ElevenLabs; it is a build artifact, not
+# a source, and it is large. scripts/build-walkthrough.sh regenerates it.
+project/acceptance/.audio/
+project/acceptance/.build-*/
+
+# Silent capture: the input to scripts/build-walkthrough.sh, not a deliverable.
+# Regenerate with `node scripts/capture-walkthrough.js`.
+project/acceptance/RiverHawk_IMAX_Walkthrough_*_silent.mp4

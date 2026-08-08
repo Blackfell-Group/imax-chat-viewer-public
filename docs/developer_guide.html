@@ -1,0 +1,279 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Developer Guide — IMAX Chat-Viewer</title>
+<style>
+  :root {
+    --bg: #0f1419;
+    --paper: #171d24;
+    --line: #263140;
+    --text: #e6edf3;
+    --text-dim: #8b98a5;
+    --primary: #4da3ff;
+    --secondary: #9a7bff;
+    --entity-geo: #39c5a3;
+    --banner: #e3c000;
+    --banner-text: #1a1400;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: Roboto, 'Noto Sans', 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+    font-size: 15px;
+    line-height: 1.65;
+  }
+  header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 12px 24px;
+    background: var(--paper);
+    border-bottom: 1px solid var(--line);
+    position: sticky;
+    top: 0;
+    z-index: 2;
+  }
+  .app-title {
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    white-space: nowrap;
+  }
+  .app-subtitle { color: var(--text-dim); font-weight: 400; }
+  .unclass-banner {
+    margin: 0 auto;
+    padding: 2px 12px;
+    border-radius: 16px;
+    background: var(--banner);
+    color: var(--banner-text);
+    font-size: 13px;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+  .guide-switch {
+    margin-left: auto;
+    font-size: 13px;
+    color: var(--text-dim);
+    white-space: nowrap;
+  }
+  main { max-width: 860px; margin: 0 auto; padding: 32px 24px 72px; }
+  h1 { font-size: 26px; line-height: 1.3; margin: 0 0 4px; }
+  .lede { color: var(--text-dim); margin: 0 0 28px; }
+  h2 {
+    font-size: 19px;
+    margin: 40px 0 12px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--line);
+  }
+  a { color: var(--primary); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  p { margin: 0 0 14px; }
+  ol, ul { margin: 0 0 14px; padding-left: 24px; }
+  li { margin-bottom: 8px; }
+  li::marker { color: var(--text-dim); }
+  code {
+    font-family: 'Roboto Mono', ui-monospace, Menlo, Consolas, monospace;
+    font-size: 13px;
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 1px 5px;
+  }
+  pre {
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 14px 18px;
+    overflow-x: auto;
+    margin: 0 0 18px;
+  }
+  pre code { background: none; border: none; padding: 0; }
+  pre .cmt { color: var(--text-dim); }
+  table { border-collapse: collapse; width: 100%; margin: 0 0 18px; font-size: 14px; }
+  th, td { text-align: left; padding: 8px 12px; border: 1px solid var(--line); }
+  th { background: var(--paper); font-weight: 700; }
+  td code { white-space: nowrap; }
+  .rule {
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-left: 3px solid var(--primary);
+    border-radius: 6px;
+    padding: 12px 16px;
+    margin-bottom: 12px;
+  }
+  .rule strong { display: block; margin-bottom: 2px; }
+  .rule span { color: var(--text-dim); font-size: 14px; }
+  @media (max-width: 720px) { .guide-switch { display: none; } }
+</style>
+</head>
+<body>
+<header>
+  <span class="app-title">IMAX CHAT-VIEWER <span class="app-subtitle">· Developer Guide</span></span>
+  <span class="unclass-banner">UNCLASSIFIED // DEMONSTRATION DATA</span>
+  <span class="guide-switch"><a href="user_guide.html">← User Guide</a></span>
+</header>
+<main>
+  <h1>Developer Guide — Phase 3 Angular build</h1>
+  <p class="lede">UNCLASSIFIED — Deliverable ④</p>
+
+  <p>The Angular SPA at <code>angular/</code> is the delivery codebase; the React app
+  at <code>src/</code> is the Phase 2 reference implementation (living spec) and ships
+  unchanged. Testids and mock-service contracts carry between them 1:1 — that is the
+  acceptance mechanism.</p>
+
+  <h2>Architecture</h2>
+<pre><code>angular/src/app
+├── core
+│   ├── models        api.models.ts (frozen wire contracts) · session.models.ts (client state)
+│   ├── api           SearchApi · TranslateApi · EntitiesApi · SummarizeApi · OcrApi
+│   └── stores        TriageStore · SessionStore · GoldCopyStore   (signals, in-memory)
+└── features
+    ├── triage        TriagePanel (queue + search) · SnippetHighlight
+    ├── viewer        ChatViewer · MessageBubble · OcrDialog
+    └── gold-copy     GoldCopyPanel · ProvenanceLine</code></pre>
+
+  <ul>
+    <li><strong>Angular 21 (LTS), pinned exact</strong> in
+    <code>angular/package.json</code>; standalone components, signals, built-in control
+    flow. No APIs newer than v17 — the pin is a stated assumption in the kickoff
+    correspondence and an adjacent-major <code>ng update</code> is deliberately
+    cheap.</li>
+    <li><strong>Stores</strong> hold all client state, in-memory only (the evaluated
+    demo's performance claim — no persistence):
+      <ul>
+        <li><code>TriageStore</code> — selected thread, focus-message (with a
+        retrigger counter so repeat hits re-flash), and per-thread dispositions.
+        Dispositions live here, not in the panel, because promoting a thread to gold
+        marks it worked from the viewer side.</li>
+        <li><code>SessionStore</code> — cached machine translations and entities
+        (enrichment is thread-level, run once from the workflow strip), review
+        verdicts, analyst notes, doc notes, and doc tags with the folded
+        <code>tag → {threads, docs}</code> index that feeds the officer-tag
+        facet.</li>
+        <li><code>GoldCopyStore</code> — promoted thread-gold entries: the bench's
+        single output. Snippet evidence clips were removed 1 Aug (logged deviation;
+        single-commit revert if the Sponsor requires strict parity).</li>
+      </ul>
+    </li>
+    <li><strong>Enrichment is fixture-backed by default and gateway-backed by
+    configuration.</strong> <code>providers/model-gateway.js</code> speaks the
+    OpenAI-compatible chat-completions wire format; supply <code>MODEL_ENDPOINT</code>
+    and <code>MODEL_NAME</code> in the deployment ConfigMap and
+    <code>MODEL_API_KEY</code> in the Secret (all three are environment-specific; no
+    gateway address is committed), and translation and OCR answer from the enclave's
+    live model instead of the seed fixtures — same contracts, no client rework.
+    Translation sends full thread context; OCR uses vision on rasterized pages
+    (<code>node scripts/rasterize-attachments.js</code>). Every failure path falls
+    back to the fixture and logs. Provenance reports the engine
+    (<code>&lt;gateway-host&gt;:&lt;model&gt;</code>), so the gold copy never
+    misstates who translated what. Details: <code>deploy/README.md</code> §4.</li>
+    <li><strong>API services</strong> mirror the route contracts verbatim
+    (<code>routes/*.js</code> headers are the source of truth; the contracts are
+    frozen). Wire-format unit tests pin URL, params, and body shapes per service.</li>
+    <li><strong>Escaping discipline</strong>: corpus text renders as text nodes only —
+    snippet highlighting builds <code>&lt;mark&gt;</code> spans from split text, never
+    <code>innerHTML</code>.</li>
+  </ul>
+
+  <h3>Three things that are easy to undo by accident</h3>
+  <p><strong>The message stream is virtualized</strong>
+  (<code>cdk-virtual-scroll-viewport</code>, fixed-size strategy). The autosize strategy
+  lives in <code>@angular/cdk-experimental</code>, and adding an experimental package the
+  enclave's npm mirror has to carry and the vulnerability gate has to clear is a bad trade
+  for a deliverable the Government maintains. Two consequences: anything that finds a
+  message by <code>document.querySelector</code> will usually miss, because the target is
+  not in the DOM — jump-to-evidence asks the viewport for the index first; and
+  <code>tests/ng/virtual-scroll.spec.js</code> asserts a bounded DOM on a synthetic
+  2,000-message thread, so a change that quietly reverts windowing fails there rather than
+  in the enclave.</p>
+
+  <p><strong>Render order is decided in the viewer</strong>, not taken from the service.
+  Collection feeds do not guarantee chronological delivery — the audio-cut fixtures did
+  not — so <code>orderedMessages</code> sorts, and the promoted transcript sorts
+  chronologically regardless of which way the linguist is reading.</p>
+
+  <p><strong>Nothing is persisted.</strong> No <code>localStorage</code>,
+  <code>sessionStorage</code>, <code>IndexedDB</code> or cookies anywhere in either build.
+  Panel widths, sort direction, viewer geometry and all officer work live in signals and
+  reset on reload. This is a requirement (TDD Task 3), not an oversight;
+  <code>SessionStore</code> is the seam if production needs otherwise.</p>
+
+  <div class="note">For the system as a whole — services, certificates, identity,
+  deployment topology, and the values only the target environment can supply — see
+  <code>docs/architecture.md</code>. That document is written to stand on its own; this
+  one assumes you are in the code.</div>
+
+  <h2>Dev topology</h2>
+<pre><code>npm install &amp;&amp; npm --prefix angular install
+npm run dev:ng        <span class="cmt"># mock services :5177 + ng serve :4200 (proxy.conf.json)</span>
+npm run dev           <span class="cmt"># the React reference app (:5273), same mock services</span></code></pre>
+
+  <h2>Tests</h2>
+<pre><code>npm --prefix angular run lint &amp;&amp; npm --prefix angular run build &amp;&amp; npm --prefix angular test
+npm run test:ng       <span class="cmt"># e2e vs the Angular build (Playwright boots both servers)</span>
+npm test              <span class="cmt"># the original suite vs the React reference app</span></code></pre>
+  <ul>
+    <li><code>tests/*.spec.js</code> — the 7-spec Phase 2 acceptance suite (+ shared
+    shell/services specs). It drives the browser by testid, so it runs against either
+    app: the ported flows live verbatim inside <code>tests/ng/*.spec.js</code> and all
+    7 pass against the Angular build (see <code>project/evidence/README.md</code> for
+    the coverage table).</li>
+    <li><code>tests/ng/</code> — Angular-build specs: the verbatim acceptance flows
+    plus amendment coverage (queue progress, stack-clear, thread gold end-to-end). The
+    React config ignores this directory.</li>
+    <li>CI (<code>.github/workflows/angular-ci.yml</code>): lint → prod build → unit →
+    e2e, plus the <code>package-validate</code> job on every push.</li>
+  </ul>
+
+  <h2>Ground rules for new work</h2>
+  <div class="rule">
+    <strong>1. <code>data-testid</code> values are the contract.</strong>
+    <span>Never rename one; additions are fine (the amendment added
+    <code>thread-*</code>/<code>queue-progress</code>/<code>stack-clear</code> testids
+    — additive only).</span>
+  </div>
+  <div class="rule">
+    <strong>2. Mock contracts are frozen.</strong>
+    <span>UI change? fine. Route shape change? that's a Sponsor conversation, not a
+    refactor.</span>
+  </div>
+  <div class="rule">
+    <strong>3. Visual parity with the evaluated demo.</strong>
+    <span>Palette and layout tokens live in <code>styles.scss</code> as CSS custom
+    properties (entity colors are part of the design contract). Parity baseline:
+    <code>project/parity/</code>.</span>
+  </div>
+
+  <h2>Deployment</h2>
+  <p>The full packaging story (six images, kustomize manifests, probes/limits,
+  statelessness, registry push, production cutover) is <code>deploy/README.md</code>.
+  Short version:</p>
+<pre><code>./deploy/build-images.sh 0.1.0
+kubectl apply -k deploy/k8s
+kubectl port-forward svc/imax-spa 8443:8443</code></pre>
+  <p>CI proves the set on a kind cluster every push (image builds → trivy CRITICAL
+  gate → deploy → rollout → smoke through the SPA proxy chain). The production
+  cutover swaps the nginx upstreams for enrichment-service endpoints — contracts frozen, no client
+  rework.</p>
+
+  <h2>Repo map</h2>
+  <table>
+    <thead><tr><th>Path</th><th>What</th></tr></thead>
+    <tbody>
+      <tr><td><code>angular/</code></td><td>Delivery SPA (this guide's subject)</td></tr>
+      <tr><td><code>src/</code>, <code>index.html</code>, <code>vite.config.mjs</code></td><td>React reference implementation (frozen spec)</td></tr>
+      <tr><td><code>server.js</code>, <code>routes/</code>, <code>data/</code>, <code>static/</code></td><td>Mock enrichment services + seed corpus (frozen contracts)</td></tr>
+      <tr><td><code>tests/</code></td><td>Playwright acceptance + Angular-build suites</td></tr>
+      <tr><td><code>deploy/</code></td><td>Dockerfiles, manifests, deployment guide</td></tr>
+      <tr><td><code>hcd/</code></td><td>Deliverable ① — personas, empathy maps, wireframes, workflow model</td></tr>
+      <tr><td><code>docs/</code></td><td>Deliverable ④ — this guide + the user guide</td></tr>
+      <tr><td><code>project/</code></td><td>Deliverable ⑤/⑥ — risk register, burndown, evidence trail</td></tr>
+    </tbody>
+  </table>
+</main>
+</body>
+</html>

@@ -1,0 +1,392 @@
+name: Angular CI
+
+on:
+  push:
+    branches: [main, phase3-angular]
+  pull_request:
+
+jobs:
+  build-lint-e2e:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            angular/package-lock.json
+
+      - name: Install root dependencies (mock server + Playwright)
+        run: npm ci
+
+      - name: Install Angular workspace dependencies
+        run: npm ci --prefix angular
+
+      - name: Lint
+        run: npm run lint --prefix angular
+
+      - name: Build (production)
+        run: npm run build --prefix angular
+
+      # The target enclave has no egress. This fails the build if the SPA
+      # reaches for the public internet at runtime — the regression it guards
+      # against (CDN webfonts) is invisible here, where egress works, and
+      # renders every icon as literal ligature text inside the enclave.
+      - name: Air-gap preflight (no external URLs, fonts vendored)
+        run: ./scripts/preflight-airgap.sh
+
+      - name: Unit tests
+        run: npm test --prefix angular
+
+      # Identity header resolution and the 401/403 enforcement paths. Covered
+      # here because a deployment never exercises a refusal until it refuses a
+      # real user, and the header names are configuration — "swappable" has to
+      # be proven, not asserted.
+      - name: Unit tests (edge identity)
+        run: npm run test:node
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+
+      - name: E2E (day-1 shell spec against ng serve)
+        run: npm run test:ng
+
+  # Deliverable proof for the target environment packaging checklist: build the
+  # six-image set, scan it, and prove the manifests on a real (kind) cluster
+  # end-to-end — SPA reaches the mock pods over cluster DNS.
+  package-validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build images
+        run: ./deploy/build-images.sh 0.1.0
+
+      - name: Vulnerability scan (trivy, gate on CRITICAL)
+        run: |
+          curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin
+          for IMG in imax-spa imax-mock-search imax-mock-translation imax-mock-entities imax-mock-summarize imax-mock-ocr; do
+            echo "==> scanning ${IMG}:0.1.0"
+            trivy image --severity CRITICAL --exit-code 1 --ignore-unfixed --quiet "${IMG}:0.1.0"
+          done
+
+      - name: Create kind cluster
+        uses: helm/kind-action@v1
+        with:
+          cluster_name: imax
+
+      - name: Load images into kind
+        run: |
+          for IMG in imax-spa imax-mock-search imax-mock-translation imax-mock-entities imax-mock-summarize imax-mock-ocr; do
+            kind load docker-image "${IMG}:0.1.0" --name imax
+          done
+
+      - name: Deploy
+        run: |
+          kubectl apply -k deploy/k8s
+          for D in imax-spa imax-mock-search imax-mock-translation imax-mock-entities imax-mock-summarize imax-mock-ocr; do
+            kubectl rollout status deployment/$D --timeout=120s
+          done
+
+      - name: In-cluster smoke (SPA proxy chain to the mock pods)
+        run: |
+          kubectl port-forward svc/imax-spa 8443:8443 &
+          sleep 3
+          curl -sf http://localhost:8443/healthz
+          curl -sf http://localhost:8443/ | grep -q 'app-root'
+          curl -sf http://localhost:8443/api/search/threads | grep -q 'threads'
+          curl -sf -X POST http://localhost:8443/api/translate -H 'Content-Type: application/json' -d '{"messageId":"m-1","srcLang":"ar"}' | grep -q 'Abu Karim'
+          curl -sf -X POST http://localhost:8443/api/ocr -H 'Content-Type: application/json' -d '{"attachmentId":"a-7001"}' | grep -q 'BILL OF LADING'
+          curl -sf http://localhost:8443/static/attachments/a-7001.svg > /dev/null
+          curl -sf http://localhost:8443/fonts/material-icons.woff2 > /dev/null
+          # Identity: the edge republishes what the front asserted, under the
+          # configured header names. Default mode is disabled, so headers are
+          # parsed and shown without being required.
+          curl -sf http://localhost:8443/api/whoami | grep -q '"mode":"disabled"'
+          curl -sf http://localhost:8443/api/whoami \
+            -H 'x-ain: a1234567' -H 'x-name: R. Vance' \
+            -H 'x-ismemberof: IMAX-LINGUIST;ENRICH-ALL' -H 'x-org: ANALYSIS/OPS' \
+            | tee /dev/stderr | grep -q '"name":"R. Vance"'
+          echo 'cluster smoke green'
+
+      # the target environment's front is oauth2-proxy in front of the STS: it forwards the
+      # identity token in Authorization rather than the flat headers above.
+      # Proven on the cluster and not only in unit tests, because the failure
+      # mode is that every request 401s behind the real front and nothing
+      # reveals that until someone logs in at the demo.
+      - name: Identity from an STS token (bearer-jwt)
+        run: |
+          kubectl patch configmap imax-auth --type=merge \
+            -p '{"data":{"AUTH_MODE":"bearer-jwt"}}'
+          kubectl rollout restart deploy/imax-spa
+          kubectl rollout status deploy/imax-spa --timeout=120s
+
+          # Unsigned on purpose: bearer-jwt decodes and does not verify, so a
+          # signed fixture would prove something the production path never does.
+          CLAIMS=$(printf '%s' '{"sub":"a1234567","name":"R. Vance","groups":["IMAX-LINGUIST","ENRICH-ALL"],"org":"ANALYSIS/OPS"}' \
+            | base64 -w0 | tr '+/' '-_' | tr -d '=')
+          TOKEN="eyJhbGciOiJub25lIn0.${CLAIMS}."
+
+          kubectl port-forward svc/imax-spa 8444:8443 &
+          sleep 3
+          curl -sf http://localhost:8444/api/whoami -H "Authorization: Bearer ${TOKEN}" \
+            | tee /dev/stderr | grep -q '"name":"R. Vance"'
+          # Groups arrive as a JSON array in a token, not a delimited string.
+          curl -sf http://localhost:8444/api/whoami -H "Authorization: Bearer ${TOKEN}" \
+            | grep -q 'IMAX-LINGUIST'
+          # No token must be refused, not admitted with a null identity.
+          if curl -sf --max-time 5 http://localhost:8444/api/whoami; then
+            echo 'FAIL: admitted a request with no token'; exit 1
+          fi
+          # And the flat headers must NOT authenticate in this mode — a
+          # half-configured front has to fail closed.
+          if curl -sf --max-time 5 http://localhost:8444/api/whoami -H 'x-ain: a1234567'; then
+            echo 'FAIL: authenticated off a header in bearer-jwt mode'; exit 1
+          fi
+
+          kubectl patch configmap imax-auth --type=merge \
+            -p '{"data":{"AUTH_MODE":"disabled"}}'
+          kubectl rollout restart deploy/imax-spa
+          kubectl rollout status deploy/imax-spa --timeout=120s
+          echo 'bearer-jwt green'
+
+      # The enclave may require every hop to be TLS, not just the ingress one.
+      # Re-deploy the same images through the TLS overlay: certificate mounted
+      # from a Secret, all six pods serving https, probes switched to HTTPS,
+      # and the SPA edge dialling the enrichment pods over https too. An
+      # overlay that has never rolled out is not a capability, it is a claim.
+      - name: TLS overlay on the same cluster
+        run: |
+          openssl req -x509 -newkey rsa:2048 -nodes -days 1 \
+            -keyout /tmp/tls.key -out /tmp/tls.crt -subj '/CN=imax' \
+            -addext 'subjectAltName=DNS:localhost,DNS:imax-spa,DNS:imax-mock-search,DNS:imax-mock-translation,DNS:imax-mock-entities,DNS:imax-mock-summarize,DNS:imax-mock-ocr'
+          kubectl create secret generic imax-tls \
+            --from-file=tls.crt=/tmp/tls.crt \
+            --from-file=tls.key=/tmp/tls.key \
+            --from-file=ca.pem=/tmp/tls.crt
+          kubectl apply -k deploy/overlays/tls
+          kubectl rollout status deploy -l part-of=imax-chat-viewer --timeout=180s
+
+          kubectl port-forward svc/imax-spa 9443:8443 &
+          sleep 3
+          curl -sf --cacert /tmp/tls.crt https://localhost:9443/healthz
+          # Plaintext against the TLS port must fail — a silent downgrade is
+          # the one outcome worse than a hard failure.
+          if curl -sf --max-time 5 http://localhost:9443/healthz; then
+            echo 'FAIL: served plaintext on the TLS port'; exit 1
+          fi
+          # Proxy chain over https, edge to enrichment pod.
+          curl -sf --cacert /tmp/tls.crt https://localhost:9443/api/search/threads | grep -q threads
+          curl -sf --cacert /tmp/tls.crt https://localhost:9443/api/whoami \
+            -H 'x-ain: a1234567' -H 'x-name: R. Vance' | grep -q '"name":"R. Vance"'
+          echo 'TLS overlay green'
+
+      # the target environment is an automated cluster on AWS the target AWS partition: nobody runs `kubectl
+      # create secret --from-file`, and the certificates live in Secrets
+      # Manager behind a role. The tls-awssm overlay reaches the SAME running
+      # state as the overlay above, with an initContainer staging the material
+      # instead of a human. Smoked here against a stand-in Secrets Manager
+      # (tests/ci/sm-stub.js) because an overlay that has never rolled out is
+      # not a capability, it is a claim — and the real endpoint is somewhere we
+      # get exactly one attempt.
+      - name: TLS overlay sourcing certificates from Secrets Manager
+        run: |
+          kubectl delete -k deploy/overlays/tls --ignore-not-found
+          kubectl delete secret imax-tls --ignore-not-found
+
+          # The stand-in serves the same self-signed material the step above
+          # generated, so the assertions afterwards are directly comparable.
+          kubectl create configmap sm-stub-certs \
+            --from-file=tls.crt=/tmp/tls.crt --from-file=tls.key=/tmp/tls.key
+          kubectl create configmap sm-stub-code --from-file=stub.js=tests/ci/sm-stub.js
+          kubectl apply -f - <<'YAML'
+          apiVersion: apps/v1
+          kind: Deployment
+          metadata: {name: sm-stub}
+          spec:
+            replicas: 1
+            selector: {matchLabels: {app: sm-stub}}
+            template:
+              metadata: {labels: {app: sm-stub}}
+              spec:
+                containers:
+                  - name: sm-stub
+                    image: imax-spa:0.1.0
+                    imagePullPolicy: IfNotPresent
+                    command: ["node", "/code/stub.js"]
+                    ports: [{containerPort: 8080}]
+                    volumeMounts:
+                      - {name: code, mountPath: /code}
+                      - {name: certs, mountPath: /certs}
+                volumes:
+                  - {name: code, configMap: {name: sm-stub-code}}
+                  - {name: certs, configMap: {name: sm-stub-certs}}
+          ---
+          apiVersion: v1
+          kind: Service
+          metadata: {name: sm-stub}
+          spec:
+            selector: {app: sm-stub}
+            ports: [{port: 8080, targetPort: 8080}]
+          YAML
+          kubectl rollout status deploy/sm-stub --timeout=120s
+
+          # Run the overlay twice: cert and key in SEPARATE secrets, then both
+          # in ONE secret. Which layout the Sponsor's account uses is unknown,
+          # so both are proven rather than assumed.
+          for LAYOUT in two-secret one-secret; do
+            echo "==> layout: ${LAYOUT}"
+            if [ "$LAYOUT" = two-secret ]; then
+              CERT_SECRET=imax/cert; KEY_SECRET=imax/key
+            else
+              CERT_SECRET=imax/combined; KEY_SECRET=""
+            fi
+
+            kubectl apply -k deploy/overlays/tls-awssm
+            # Endpoint, secret names and static credentials are deploy-time
+            # configuration; envFrom pulls every key in this ConfigMap into the
+            # initContainer, so patching it is how CI stands in for the role.
+            kubectl patch configmap imax-tls-source --type=merge -p "{\"data\":{
+              \"AWS_SECRETSMANAGER_ENDPOINT\":\"http://sm-stub:8080/\",
+              \"TLS_CERT_SECRET\":\"${CERT_SECRET}\",
+              \"TLS_KEY_SECRET\":\"${KEY_SECRET}\",
+              \"TLS_CA_SECRET\":\"imax/ca\",
+              \"AWS_ACCESS_KEY_ID\":\"AKIAEXAMPLE\",
+              \"AWS_SECRET_ACCESS_KEY\":\"wJalrXUtnFEMI/K7MDENG+bPxRfiCYEXAMPLEKEY\"}}"
+            kubectl rollout restart deploy -l part-of=imax-chat-viewer
+            kubectl rollout status deploy -l part-of=imax-chat-viewer --timeout=240s
+
+            kubectl port-forward svc/imax-spa 9444:8443 &
+            PF=$!
+            sleep 3
+            curl -sf --cacert /tmp/tls.crt https://localhost:9444/healthz
+            # The same downgrade check as the file-based overlay: material that
+            # came from Secrets Manager must not be weaker than material a
+            # human mounted.
+            if curl -sf --max-time 5 http://localhost:9444/healthz; then
+              echo "FAIL (${LAYOUT}): served plaintext on the TLS port"; exit 1
+            fi
+            curl -sf --cacert /tmp/tls.crt https://localhost:9444/api/search/threads | grep -q threads
+            kill $PF 2>/dev/null || true
+            echo "${LAYOUT} green"
+          done
+
+          # The refusal path. A pod that cannot fetch its certificate must hold
+          # in Init:Error and never reach a state where it could serve
+          # plaintext on a port the cluster believes is TLS.
+          echo '==> negative: unset TLS_CERT_SECRET'
+          kubectl patch configmap imax-tls-source --type=merge \
+            -p '{"data":{"TLS_CERT_SECRET":""}}'
+          kubectl rollout restart deploy/imax-spa
+
+          # Poll the STATUS column rather than `describe`: "Init:Error" is a
+          # rendering kubectl computes for `get pods`, and does not appear in
+          # `describe` output at all. Polling instead of a fixed sleep because
+          # the pod passes through Init:0/1 before the failure sticks, and how
+          # long that takes is not ours to predict.
+          echo -n 'waiting for the new pod to fail init'
+          for i in $(seq 1 30); do
+            POD=$(kubectl get pod -l app=imax-spa \
+              --sort-by=.metadata.creationTimestamp -o name | tail -1)
+            STATUS=$(kubectl get "$POD" --no-headers 2>/dev/null | awk '{print $3}')
+            case "$STATUS" in Init:Error|Init:CrashLoopBackOff) break ;; esac
+            echo -n .; sleep 5
+          done
+          echo " -> ${STATUS}"
+
+          case "$STATUS" in
+            Init:Error|Init:CrashLoopBackOff) ;;
+            *) echo "FAIL: expected Init:Error with no secret configured, got '${STATUS}'"
+               kubectl get pod -l app=imax-spa
+               kubectl logs "$POD" -c fetch-certs --tail=20 || true
+               exit 1 ;;
+          esac
+
+          # And it must say WHY — the whole point of failing loudly.
+          kubectl logs "$POD" -c fetch-certs --tail=5 | grep -q TLS_CERT_SECRET || {
+            echo 'FAIL: init container did not name the missing configuration'
+            kubectl logs "$POD" -c fetch-certs --tail=20 || true; exit 1; }
+
+          # The pod that was already serving must still be serving: a bad
+          # config change should not take down a working deployment.
+          kubectl get pod -l app=imax-spa --field-selector=status.phase=Running \
+            -o name | grep -q . || {
+            echo 'FAIL: the previously-good pod was torn down by a failed rollout'; exit 1; }
+          echo 'negative case green'
+          echo 'Secrets Manager overlay green'
+
+      # ArgoCD deploys the Helm chart; the air-gap runbook's `kubectl apply -k`
+      # flow needs manifests that work without Helm installed. Two
+      # representations of one deployment is the drift this repository argues
+      # against everywhere else, so it is checked rather than remembered — and
+      # then the chart is actually rolled out, because a chart that has only
+      # ever been templated is not a deployment, it is a claim.
+      - name: Helm chart matches the manifests, and deploys
+        run: |
+          helm lint deploy/chart
+          pip install --quiet pyyaml
+          ./scripts/compare-chart-kustomize.py
+          ./scripts/compare-chart-kustomize.py --tls
+
+          # Roll it out on the same cluster, replacing what kustomize applied.
+          kubectl delete -k deploy/overlays/tls-awssm --ignore-not-found
+          kubectl delete -k deploy/k8s --ignore-not-found
+          helm install imax deploy/chart --wait --timeout 240s
+          kubectl rollout status deploy -l part-of=imax-chat-viewer --timeout=180s
+
+          kubectl port-forward svc/imax-spa 9445:8443 &
+          sleep 3
+          curl -sf http://localhost:9445/healthz
+          curl -sf http://localhost:9445/api/search/threads | grep -q threads
+          curl -sf http://localhost:9445/api/whoami | grep -q '"mode":"disabled"'
+          echo 'helm base green'
+
+          # And through the values that matter in the target environment: TLS on every hop
+          # with certificates from Secrets Manager, and identity from the STS
+          # token. Same stand-in endpoint the overlay step used.
+          # NOT --wait. The initContainer cannot finish until the credentials
+          # below exist, and those are injected after helm returns — so --wait
+          # here waits 300s for something that can only happen once it stops
+          # waiting. Roll out explicitly instead, after the config is complete.
+          helm upgrade imax deploy/chart \
+            --set tls.enabled=true --set tls.source=awssm \
+            --set tls.awssm.endpoint=http://sm-stub:8080/ \
+            --set tls.awssm.certSecret=imax/combined \
+            --set tls.awssm.caSecret=imax/ca \
+            --set auth.mode=bearer-jwt
+
+          # Static credentials stand in for the IAM role the real environment
+          # grants. envFrom pulls every key in this ConfigMap into the
+          # initContainer, which is the same seam the kustomize step uses.
+          kubectl patch configmap imax-tls-source --type=merge -p '{"data":{
+            "AWS_ACCESS_KEY_ID":"AKIAEXAMPLE",
+            "AWS_SECRET_ACCESS_KEY":"wJalrXUtnFEMI/K7MDENG+bPxRfiCYEXAMPLEKEY"}}'
+          kubectl rollout restart deploy -l part-of=imax-chat-viewer
+          kubectl rollout status deploy -l part-of=imax-chat-viewer --timeout=300s
+
+          kubectl port-forward svc/imax-spa 9446:8443 &
+          sleep 3
+          curl -sf --cacert /tmp/tls.crt https://localhost:9446/healthz
+          if curl -sf --max-time 5 http://localhost:9446/healthz; then
+            echo 'FAIL: served plaintext on the TLS port'; exit 1
+          fi
+          echo 'helm tls-awssm + bearer-jwt green'
+          helm uninstall imax --wait
+
+      # Built only after the scan gate and the cluster smoke, so the media that
+      # crosses to the enclave is provably the image set that passed both. A
+      # one-way transfer offers no second chance to re-verify on the far side.
+      - name: Assemble the air-gap transfer bundle
+        run: ./deploy/make-offline-bundle.sh 0.1.0
+
+      # Both halves: the image bundle (path A) and the source archive (path B).
+      # AIRGAP.md §1 tells the recipient to take both, so both are published
+      # together — the glob covers the -src archive and all four sidecars.
+      - uses: actions/upload-artifact@v4
+        with:
+          name: imax-airgap-bundle
+          path: dist-bundle/imax-prototype-0.1.0*.tar.gz*
+          retention-days: 30

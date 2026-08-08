@@ -1,0 +1,112 @@
+{{/*
+imax-spa: the Angular bundle on an Express edge — the only user-facing service.
+It serves the bundle, proxies /api/* and /static to the five enrichment
+services, and resolves caller identity from whatever the front forwards.
+
+Exposure to users is the platform's job: declare ingress.enabled and let the
+cluster's ingress controller terminate TLS and route here. The application
+ships no proxy of its own.
+*/}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: imax-spa
+  labels:
+    app: imax-spa
+    {{- include "imax.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.spa.replicas }}
+  selector:
+    matchLabels:
+      app: imax-spa
+  template:
+    metadata:
+      labels:
+        app: imax-spa
+        {{- include "imax.labels" . | nindent 8 }}
+    spec:
+      serviceAccountName: {{ .Values.serviceAccount.name }}
+      securityContext: {{- include "imax.podSecurityContext" . | nindent 8 }}
+      {{- include "imax.certInit" (dict "root" . "name" "spa") | nindent 6 }}
+      containers:
+        - name: imax-spa
+          image: {{ include "imax.image" (dict "root" . "name" "spa") }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          securityContext: {{- include "imax.containerSecurityContext" . | nindent 12 }}
+          envFrom:
+            - configMapRef:
+                name: {{ .Release.Name }}-auth
+                optional: true
+            {{- if .Values.tls.enabled }}
+            - configMapRef:
+                name: {{ .Release.Name }}-tls-config
+            {{- end }}
+          {{- with include "imax.tlsVolumeMount" . }}
+          volumeMounts: {{- . | nindent 12 }}
+          {{- end }}
+          ports:
+            - containerPort: {{ .Values.spa.port }}
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: {{ .Values.spa.port }}
+              scheme: {{ include "imax.probeScheme" . }}
+            initialDelaySeconds: 3
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: {{ .Values.spa.port }}
+              scheme: {{ include "imax.probeScheme" . }}
+            initialDelaySeconds: 2
+            periodSeconds: 5
+          resources: {{- toYaml .Values.spa.resources | nindent 12 }}
+      {{- with include "imax.tlsVolume" . }}
+      volumes: {{- . | nindent 8 }}
+      {{- end }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: imax-spa
+  labels:
+    app: imax-spa
+    {{- include "imax.labels" . | nindent 4 }}
+spec:
+  type: ClusterIP
+  selector:
+    app: imax-spa
+  ports:
+    - port: {{ .Values.spa.port }}
+      targetPort: {{ .Values.spa.port }}
+{{- if .Values.ingress.enabled }}
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: imax-spa
+  labels: {{- include "imax.labels" . | nindent 4 }}
+  {{- with .Values.ingress.annotations }}
+  annotations: {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  {{- with .Values.ingress.className }}
+  ingressClassName: {{ . }}
+  {{- end }}
+  {{- with .Values.ingress.tls }}
+  tls: {{- toYaml . | nindent 4 }}
+  {{- end }}
+  rules:
+    - {{- with .Values.ingress.host }}
+      host: {{ . | quote }}
+      {{- end }}
+      http:
+        paths:
+          - path: {{ .Values.ingress.path }}
+            pathType: {{ .Values.ingress.pathType }}
+            backend:
+              service:
+                name: imax-spa
+                port:
+                  number: {{ .Values.spa.port }}
+{{- end }}

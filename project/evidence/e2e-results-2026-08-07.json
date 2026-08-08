@@ -1,0 +1,1874 @@
+{
+  "config": {
+    "argv": [
+      "/Users/gowin/.nvm/versions/node/v22.21.0/bin/node",
+      "/Users/gowin/imax-chat-viewer/node_modules/.bin/playwright",
+      "test",
+      "--config",
+      "playwright.ng.config.js",
+      "--reporter=json",
+      "shell.spec.js",
+      "services.spec.js",
+      "ng/"
+    ],
+    "configFile": "/Users/gowin/imax-chat-viewer/playwright.ng.config.js",
+    "rootDir": "/Users/gowin/imax-chat-viewer/tests",
+    "failOnFlakyTests": false,
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 8
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "/Users/gowin/imax-chat-viewer/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 8
+        },
+        "id": "",
+        "name": "",
+        "testDir": "/Users/gowin/imax-chat-viewer/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "json"
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.61.1",
+    "workers": 8,
+    "webServer": null
+  },
+  "suites": [
+    {
+      "title": "ng/bilingual.spec.js",
+      "file": "ng/bilingual.spec.js",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "threads open bilingual: English leads, source always on screen, no toggle",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 445,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-08-07T18:58:18.651Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "07655bb48b0db70dc4f5-c8475c17adf2006395a6",
+          "file": "ng/bilingual.spec.js",
+          "line": 7,
+          "column": 1
+        },
+        {
+          "title": "correction happens against the source; review state is obvious",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 434,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-08-07T18:58:19.213Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "07655bb48b0db70dc4f5-e977692b9ed382d0b728",
+          "file": "ng/bilingual.spec.js",
+          "line": 30,
+          "column": 1
+        }
+      ]
+    },
+    {
+      "title": "ng/customs-file.spec.js",
+      "file": "ng/customs-file.spec.js",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "the customs file opens, pages through all five, and reads RTL",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 1,
+                  "status": "passed",
+                  "duration": 625,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-08-07T18:58:18.626Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d35ee2c5c4bb6d7e5151-b41958fb19bfa35aa742",
+          "file": "ng/customs-file.spec.js",
+          "line": 11,
+          "column": 1
+        },
+        {
+          "title": "the customs file carries an English gloss covering the whole document",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 1,
+                  "status": "passed",
+                  "duration": 356,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-08-07T18:58:19.384Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d35ee2c5c4bb6d7e5151-b9d573fd93e85b8c2d78",
+          "file": "ng/customs-file.spec.js",
+          "line": 45,
+          "column": 1
+        },
+        {
+          "title": "the customs file is reachable by its declaration number and its entities",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 1,
+                  "status": "passed",
+                  "duration": 452,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-08-07T18:58:19.748Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d35ee2c5c4bb6d7e5151-a5e4e319e849ec8add23",
+          "file": "ng/customs-file.spec.js",
+          "line": 60,
+          "column": 1
+        }
+      ]
+    },
+    {
+      "title": "ng/enrichment.spec.js",
+      "file": "ng/enrichment.spec.js",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "auto-translation renders and thread-level entity extraction chips every message",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 2,
+                  "status": "passed",
+                  "duration": 479,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-08-07T18:58:18.651Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d396acce65c8d229e1ee-fa7b73b34337edf9db08",
+          "file": "ng/enrichment.spec.js",
+          "line": 9,
+          "column": 1
+        },
+        {
+          "title": "translation review and analyst note (smoke-6 review flow, clips removed)",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 2,
+                  "status": "passed",
+                  "duration": 441,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-08-07T18:58:19.245Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d396acce65c8d229e1ee-1745d3500d421926e9b7",
+          "file": "ng/enrichment.spec.js",
+          "line": 31,
+          "column": 1
+        },
+        {
+          "title": "the one output: export is locked until a thread is promoted, then carries verdicts and notes",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 2,
+                  "status": "passed",
+                  "duration": 547,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-08-07T18:58:19.690Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d396acce65c8d229e1ee-d4cdb74d06a05347c822",
+          "file": "ng/enrichment.spec.js",
+          "line": 51,
+          "column": 1
+        }
+      ]
+    },
+    {
+      "title": "ng/flagged-facet.spec.js",
+      "file": "ng/flagged-facet.spec.js",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "flagging surfaces a Flagged facet that isolates the handoff pile",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 3,
+                  "parallelIndex": 3,
+                  "status": "passed",
+                  "duration": 685,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-08-07T18:58:18.632Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "02ad4a65413c5c85f71f-d1f5562fe69f2662a94a",
+          "file": "ng/flagged-facet.spec.js",
+          "line": 11,
+          "column": 1
+        },
+        {
+          "title": "flagged-first sorting lifts the handoff pile without losing the rest",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 3,
+                  "parallelIndex": 3,
+                  "status": "passed",
+                  "duration": 269,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-08-07T18:58:19.444Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "02ad4a65413c5c85f71f-8ac14089a834cd7c7c5c",
+          "file": "ng/flagged-facet.spec.js",
+          "line": 38,
+          "column": 1
+        },
+        {
+          "title": "the flagged filter clears with everything else",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 3,
+                  "parallelIndex": 3,
+                  "status": "passed",
+                  "duration": 446,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-08-07T18:58:19.718Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "02ad4a65413c5c85f71f-36c2040e2af2b72309eb",
+          "file": "ng/flagged-facet.spec.js",
+          "line": 54,
+          "column": 1
+        }
+      ]
+    },
+    {
+      "title": "ng/gold-copy-panel.spec.js",
+      "file": "ng/gold-copy-panel.spec.js",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "copying the export confirms it happened",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 4,
+                  "parallelIndex": 4,
+                  "status": "passed",
+                  "duration": 671,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-08-07T18:58:18.633Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "69ca95be92ffd9517e2e-2b8150ca916d0797dd4c",
+          "file": "ng/gold-copy-panel.spec.js",
+          "line": 20,
+          "column": 1
+        },
+        {
+          "title": "the export dialog is large and maximizes",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 4,
+                  "parallelIndex": 4,
+                  "status": "passed",
+                  "duration": 622,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-08-07T18:58:19.436Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "69ca95be92ffd9517e2e-cc9f198804f525527529",
+          "file": "ng/gold-copy-panel.spec.js",
+          "line": 38,
+          "column": 1
+        },
+        {
+          "title": "gold threads reorder by drag, and the export follows the new order",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 4,
+                  "parallelIndex": 4,
+                  "status": "passed",
+                  "duration": 955,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-08-07T18:58:20.064Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "69ca95be92ffd9517e2e-b1edb24c0a41ed215c4f",
+          "file": "ng/gold-copy-panel.spec.js",
+          "line": 55,
+          "column": 1
+        },
+        {
+          "title": "both side panels resize by dragging, and double-click restores",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 4,
+                  "parallelIndex": 4,
+                  "status": "passed",
+                  "duration": 324,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-08-07T18:58:21.023Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "69ca95be92ffd9517e2e-f475e04f851dd5416ccc",
+          "file": "ng/gold-copy-panel.spec.js",
+          "line": 92,
+          "column": 1
+        }
+      ]
+    },
+    {
+      "title": "ng/multipage-doc.spec.js",
+      "file": "ng/multipage-doc.spec.js",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "multi-page Russian document: pages, Cyrillic blocks, and gloss",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 5,
+                  "parallelIndex": 5,
+                  "status": "passed",
+                  "duration": 639,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-08-07T18:58:18.639Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "442c3ecf5a9573e4822b-4685a012c523fa08fac2",
+          "file": "ng/multipage-doc.spec.js",
+          "line": 8,
+          "column": 1
+        },
+        {
+          "title": "the contract surfaces in a flagged-numbers watchlist sweep",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 5,
+                  "parallelIndex": 5,
+                  "status": "passed",
+                  "duration": 506,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-08-07T18:58:19.399Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "442c3ecf5a9573e4822b-c3548555114636b9979f",
+          "file": "ng/multipage-doc.spec.js",
+          "line": 47,
+          "column": 1
+        }
+      ]
+    },
+    {
+      "title": "ng/ocr-threadgold.spec.js",
+      "file": "ng/ocr-threadgold.spec.js",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "officer document annotation: tag + note, and the tag filters the queue",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 6,
+                  "parallelIndex": 6,
+                  "status": "passed",
+                  "duration": 618,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-08-07T18:58:18.640Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "845c1488524b167b8ace-a0d8bba67f4fc167890a",
+          "file": "ng/ocr-threadgold.spec.js",
+          "line": 8,
+          "column": 1
+        },
+        {
+          "title": "OCR viewer: extracted blocks render with engine caption",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 6,
+                  "parallelIndex": 6,
+                  "status": "passed",
+                  "duration": 287,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-08-07T18:58:19.379Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "845c1488524b167b8ace-e12284098799721b0c75",
+          "file": "ng/ocr-threadgold.spec.js",
+          "line": 37,
+          "column": 1
+        },
+        {
+          "title": "thread gold: translate thread, review all, promote — the stack ticks",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 6,
+                  "parallelIndex": 6,
+                  "status": "passed",
+                  "duration": 459,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-08-07T18:58:19.673Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "845c1488524b167b8ace-449e9b668c768f4a43d0",
+          "file": "ng/ocr-threadgold.spec.js",
+          "line": 48,
+          "column": 1
+        }
+      ]
+    },
+    {
+      "title": "ng/ocr-viewer-size.spec.js",
+      "file": "ng/ocr-viewer-size.spec.js",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "the scan viewer maximizes and the image grows with it",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 7,
+                  "parallelIndex": 7,
+                  "status": "passed",
+                  "duration": 659,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-08-07T18:58:18.640Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "83cef85d37f29f359dcd-6003bb4a26a080fbcb16",
+          "file": "ng/ocr-viewer-size.spec.js",
+          "line": 23,
+          "column": 1
+        },
+        {
+          "title": "zoom controls scale the scan past fit",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 7,
+                  "parallelIndex": 7,
+                  "status": "passed",
+                  "duration": 551,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-08-07T18:58:19.427Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "83cef85d37f29f359dcd-a75a9b15d6de3c9a6585",
+          "file": "ng/ocr-viewer-size.spec.js",
+          "line": 43,
+          "column": 1
+        },
+        {
+          "title": "a coined tag carries to the next document, and Add works without Enter",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 7,
+                  "parallelIndex": 7,
+                  "status": "passed",
+                  "duration": 448,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-08-07T18:58:19.988Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "83cef85d37f29f359dcd-85b3e3dd0f5da0e05ef3",
+          "file": "ng/ocr-viewer-size.spec.js",
+          "line": 59,
+          "column": 1
+        },
+        {
+          "title": "typing a tag and clicking away still commits it",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 7,
+                  "parallelIndex": 7,
+                  "status": "passed",
+                  "duration": 241,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-08-07T18:58:20.441Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "83cef85d37f29f359dcd-bdb3a844bfa3e3f99a51",
+          "file": "ng/ocr-viewer-size.spec.js",
+          "line": 85,
+          "column": 1
+        }
+      ]
+    },
+    {
+      "title": "ng/panels.spec.js",
+      "file": "ng/panels.spec.js",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "triage panel collapses to a rail and expands via nav-expand",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 275,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-08-07T18:58:19.656Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "3d5c1db3e3223dccdf97-d100df82ef3f9640324b",
+          "file": "ng/panels.spec.js",
+          "line": 8,
+          "column": 1
+        },
+        {
+          "title": "gold copy panel collapses independently via goldcopy-expand",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 179,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-08-07T18:58:19.938Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "3d5c1db3e3223dccdf97-a1a3cdcc74800257a1b0",
+          "file": "ng/panels.spec.js",
+          "line": 17,
+          "column": 1
+        }
+      ]
+    },
+    {
+      "title": "ng/queue-only.spec.js",
+      "file": "ng/queue-only.spec.js",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "find tools collapse to leave just the queue; stack controls stay",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 5,
+                  "parallelIndex": 5,
+                  "status": "passed",
+                  "duration": 398,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-08-07T18:58:19.911Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "165f8bc9bcfc4d7dbb13-da6c51a917c5df63a600",
+          "file": "ng/queue-only.spec.js",
+          "line": 9,
+          "column": 1
+        },
+        {
+          "title": "hiding the find tools returns the linguist to their stack",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 5,
+                  "parallelIndex": 5,
+                  "status": "passed",
+                  "duration": 487,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-08-07T18:58:20.316Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "165f8bc9bcfc4d7dbb13-34d81b028ebad35c84de",
+          "file": "ng/queue-only.spec.js",
+          "line": 44,
+          "column": 1
+        }
+      ]
+    },
+    {
+      "title": "ng/queue.spec.js",
+      "file": "ng/queue.spec.js",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "content-type, language scope, and the stack ticks only when work is done",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 628,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-08-07T18:58:20.124Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "2a0f6b4e63ee321291b6-5634cd57526df65c901b",
+          "file": "ng/queue.spec.js",
+          "line": 8,
+          "column": 1
+        },
+        {
+          "title": "queue progress ticks via strip decisions and the stack can run clear",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 636,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-08-07T18:58:20.758Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "2a0f6b4e63ee321291b6-7fc46c5e680243598ff8",
+          "file": "ng/queue.spec.js",
+          "line": 40,
+          "column": 1
+        },
+        {
+          "title": "thread selection opens the viewer header",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 149,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-08-07T18:58:21.398Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "2a0f6b4e63ee321291b6-242dea7c8c6ea5f94acf",
+          "file": "ng/queue.spec.js",
+          "line": 73,
+          "column": 1
+        }
+      ]
+    },
+    {
+      "title": "ng/search.spec.js",
+      "file": "ng/search.spec.js",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "facet and group triage filters return scoped results",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 6,
+                  "parallelIndex": 6,
+                  "status": "passed",
+                  "duration": 1099,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-08-07T18:58:20.139Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "5491ef03cb382bdc60df-560b1c9bebc0c99c3d31",
+          "file": "ng/search.spec.js",
+          "line": 8,
+          "column": 1
+        },
+        {
+          "title": "4-language search: native scripts, cross-language, stats",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 6,
+                  "parallelIndex": 6,
+                  "status": "passed",
+                  "duration": 707,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-08-07T18:58:21.242Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "5491ef03cb382bdc60df-f50368eae41ad87ab6bd",
+          "file": "ng/search.spec.js",
+          "line": 26,
+          "column": 1
+        },
+        {
+          "title": "entity mode with a group implies selector search; hit opens the thread",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 6,
+                  "parallelIndex": 6,
+                  "status": "passed",
+                  "duration": 521,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-08-07T18:58:21.954Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "5491ef03cb382bdc60df-5c8f2d562b940f274e80",
+          "file": "ng/search.spec.js",
+          "line": 53,
+          "column": 1
+        }
+      ]
+    },
+    {
+      "title": "ng/viewer.spec.js",
+      "file": "ng/viewer.spec.js",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "thread queue loads and Arabic message renders RTL",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 3,
+                  "parallelIndex": 3,
+                  "status": "passed",
+                  "duration": 232,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-08-07T18:58:20.172Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "34a53299fa7bffcca551-829d025c0cf6a2f7a807",
+          "file": "ng/viewer.spec.js",
+          "line": 7,
+          "column": 1
+        },
+        {
+          "title": "message search accepts native-script and cross-language queries",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 3,
+                  "parallelIndex": 3,
+                  "status": "passed",
+                  "duration": 776,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-08-07T18:58:20.409Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "34a53299fa7bffcca551-9c3e5d4fe2808b7d42bb",
+          "file": "ng/viewer.spec.js",
+          "line": 19,
+          "column": 1
+        },
+        {
+          "title": "search hit lands on the evidence with a flash",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 3,
+                  "parallelIndex": 3,
+                  "status": "passed",
+                  "duration": 2240,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-08-07T18:58:21.189Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "34a53299fa7bffcca551-08d6c752885eab76842f",
+          "file": "ng/viewer.spec.js",
+          "line": 43,
+          "column": 1
+        },
+        {
+          "title": "summary widget renders on demand and collapses out of the way",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 3,
+                  "parallelIndex": 3,
+                  "status": "passed",
+                  "duration": 267,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-08-07T18:58:23.434Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "34a53299fa7bffcca551-2c49a5b1231a2ddfd27e",
+          "file": "ng/viewer.spec.js",
+          "line": 55,
+          "column": 1
+        }
+      ]
+    },
+    {
+      "title": "ng/virtual-scroll.spec.js",
+      "file": "ng/virtual-scroll.spec.js",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "the message stream is windowed: a 2,000-message thread renders a bounded DOM",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 1,
+                  "status": "passed",
+                  "duration": 275,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-08-07T18:58:20.211Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "ff8f4c7eb14f15409394-fd89f3c490f544021794",
+          "file": "ng/virtual-scroll.spec.js",
+          "line": 40,
+          "column": 1
+        },
+        {
+          "title": "scrolling a large thread stays inside the interaction budget",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 1,
+                  "status": "passed",
+                  "duration": 387,
+                  "errors": [],
+                  "stdout": [
+                    {
+                      "text": "worst scroll-to-repaint over 10 jumps: 19.3 ms\n"
+                    }
+                  ],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-08-07T18:58:20.493Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "ff8f4c7eb14f15409394-8aa79c81dcb5e864000c",
+          "file": "ng/virtual-scroll.spec.js",
+          "line": 62,
+          "column": 1
+        },
+        {
+          "title": "sort order applies at volume and the toggle reverses it",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 1,
+                  "status": "passed",
+                  "duration": 514,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-08-07T18:58:20.884Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "ff8f4c7eb14f15409394-449c9c5ecb629d7118cb",
+          "file": "ng/virtual-scroll.spec.js",
+          "line": 90,
+          "column": 1
+        }
+      ]
+    },
+    {
+      "title": "services.spec.js",
+      "file": "services.spec.js",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "search: thread list, thread messages, groups",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 2,
+                  "status": "passed",
+                  "duration": 85,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-08-07T18:58:20.249Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "28347d71a57fd373ed93-ef098ecc66b4f0ba6548",
+          "file": "services.spec.js",
+          "line": 7,
+          "column": 1
+        },
+        {
+          "title": "search: triage query returns matches, stats, and facet counts",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 2,
+                  "status": "passed",
+                  "duration": 49,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-08-07T18:58:20.340Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "28347d71a57fd373ed93-6ee05290a17c94b9a6bd",
+          "file": "services.spec.js",
+          "line": 23,
+          "column": 1
+        },
+        {
+          "title": "translate: fixture message translates to English",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 2,
+                  "status": "passed",
+                  "duration": 38,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-08-07T18:58:20.394Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "28347d71a57fd373ed93-42b300a4c7cd59390354",
+          "file": "services.spec.js",
+          "line": 34,
+          "column": 1
+        },
+        {
+          "title": "entities: fixture message yields person + phone",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 2,
+                  "status": "passed",
+                  "duration": 48,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-08-07T18:58:20.436Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "28347d71a57fd373ed93-a29a663cf20ab19012d9",
+          "file": "services.spec.js",
+          "line": 43,
+          "column": 1
+        },
+        {
+          "title": "summarize: fixture thread yields summary",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 2,
+                  "status": "passed",
+                  "duration": 39,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-08-07T18:58:20.489Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "28347d71a57fd373ed93-18638f124c610030f363",
+          "file": "services.spec.js",
+          "line": 52,
+          "column": 1
+        },
+        {
+          "title": "ocr: fixture attachment yields full text and blocks",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 2,
+                  "status": "passed",
+                  "duration": 43,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-08-07T18:58:20.532Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "28347d71a57fd373ed93-982ac615a852982f705f",
+          "file": "services.spec.js",
+          "line": 59,
+          "column": 1
+        }
+      ]
+    },
+    {
+      "title": "shell.spec.js",
+      "file": "shell.spec.js",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "app shell renders the toolbar and UNCLASS banner",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 2,
+                  "status": "passed",
+                  "duration": 125,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-08-07T18:58:20.580Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "880f46c66cf474b1ab90-4a185bc1a90ea26ac965",
+          "file": "shell.spec.js",
+          "line": 6,
+          "column": 1
+        },
+        {
+          "title": "dev proxy reaches the mock search service",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 2,
+                  "status": "passed",
+                  "duration": 32,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-08-07T18:58:20.709Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "880f46c66cf474b1ab90-ce7911e06e30add3f97a",
+          "file": "shell.spec.js",
+          "line": 12,
+          "column": 1
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-08-07T18:58:18.320Z",
+    "duration": 5405.33,
+    "expected": 49,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  }
+}

@@ -1,0 +1,82 @@
+# syntax=docker/dockerfile:1
+# Angular SPA pod. Stage 1 builds the production bundle (npm ci against the
+# lockfile — dependencies installed once, reproducibly); stage 2 is the same
+# Node base as the five enrichment pods, running an Express edge that serves
+# the bundle, proxies /api/* and /static to the enrichment services over
+# cluster DNS, and resolves caller identity from the front proxy's headers.
+#
+# There was an nginx stage here. It served static files, answered /healthz and
+# proxied six prefixes — 25 lines of behaviour in exchange for a second base
+# image, a second package ecosystem to patch and scan, and a second base for
+# the enclave's yard to approve. deploy/spa-entry.js does the same work on the
+# base we already ship five times.
+#
+# AIR-GAP BUILD (see deploy/AIRGAP.md). Every network dependency is a
+# build-arg:
+#   NODE_BASE     approved in-enclave base image
+#   NPM_REGISTRY  the enclave's internal npm mirror
+#   OS_PATCH=0    skip apk upgrade where no Alpine mirror is reachable
+# Defaults are the public, digest-pinned image used low-side and in CI.
+
+ARG NODE_BASE=node:22-alpine@sha256:c610fcdfb1d5b4740dd70c284ed3cb16bb857e0f7166196e36a5501df7a3aa32
+
+FROM ${NODE_BASE} AS build
+ARG NPM_REGISTRY=
+# Belt and braces against a build that tries to phone home in an enclave where
+# nothing answers: analytics is also disabled in angular.json.
+ENV CI=true \
+    NG_CLI_ANALYTICS=false \
+    NPM_CONFIG_FUND=false \
+    NPM_CONFIG_AUDIT=false \
+    NPM_CONFIG_UPDATE_NOTIFIER=false
+WORKDIR /app
+COPY angular/package.json angular/package-lock.json ./
+RUN if [ -n "$NPM_REGISTRY" ]; then npm config set registry "$NPM_REGISTRY"; fi \
+  && npm ci
+COPY angular/ .
+# Fonts are vendored under angular/public/fonts and referenced from
+# src/_fonts.scss — the bundle fetches nothing at runtime. Do not reintroduce
+# a CDN <link> in index.html; scripts/preflight-airgap.sh fails the build if
+# one appears.
+RUN npm run build
+
+# Express for the edge, from the same lockfile the enrichment pods use.
+FROM ${NODE_BASE} AS deps
+ARG NPM_REGISTRY=
+ENV CI=true NPM_CONFIG_FUND=false NPM_CONFIG_AUDIT=false NPM_CONFIG_UPDATE_NOTIFIER=false
+WORKDIR /app
+COPY deploy/mock-package.json package.json
+COPY deploy/mock-package-lock.json package-lock.json
+RUN if [ -n "$NPM_REGISTRY" ]; then npm config set registry "$NPM_REGISTRY"; fi \
+  && npm ci --omit=dev && npm cache clean --force
+
+FROM ${NODE_BASE}
+ARG OS_PATCH=1
+# Patch OS packages to current, and drop npm from the runtime image — the pod
+# only needs the node binary, and npm's bundled modules carry their own CVE
+# surface (the trivy CRITICAL gate enforces both).
+RUN if [ "$OS_PATCH" = "1" ]; then apk upgrade --no-cache; fi \
+  && rm -rf /usr/local/lib/node_modules/npm /usr/local/bin/npm /usr/local/bin/npx /opt/yarn*
+ENV NODE_ENV=production \
+    PORT=8443
+WORKDIR /app
+COPY --from=deps /app/node_modules ./node_modules
+COPY --from=build /app/dist/imax-chat-viewer-ng/browser ./public
+COPY deploy/spa-entry.js ./spa-entry.js
+COPY deploy/identity.js ./identity.js
+COPY deploy/tls.js ./tls.js
+# Certificate staging for the tls-awssm overlay. Not on the serving path — the
+# overlay runs secrets-init.js as an initContainer from THIS image, so there is
+# no second image to build, scan, or ferry.
+COPY deploy/secrets-init.js ./secrets-init.js
+COPY deploy/aws-sigv4.js ./aws-sigv4.js
+# Numeric UID (the image's `node` user): kubelet can only verify runAsNonRoot
+# against a numeric USER. Not pinned in the manifests, so a namespace that
+# assigns its own UID range is free to override it.
+USER 1000
+EXPOSE 8443
+LABEL org.opencontainers.image.title="imax-spa" \
+      org.opencontainers.image.description="IMAX Triage Workspace Angular SPA on an Express edge; port 8443; proxies /api/* and /static to the enrichment pods; resolves caller identity from proxy headers" \
+      org.opencontainers.image.vendor="River Hawk Consulting, LLC" \
+      org.opencontainers.image.source="https://github.com/Blackfell-Group/imax-chat-viewer"
+CMD ["node", "spa-entry.js"]

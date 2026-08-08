@@ -1,0 +1,87 @@
+[
+  {
+    "id": "01_opening",
+    "title": "What this is",
+    "text": "IMAX is a triage workspace for linguists and targeting officers working multi-language intercepted communications. Everything you see is fabricated — every name, number and document. The banner says so on every screen, because a screenshot of this should never be mistaken for intelligence."
+  },
+  {
+    "id": "02_bilingual",
+    "title": "No verdict without the source",
+    "text": "Threads open bilingual. English leads, the original stays on screen, and the direction is correct for right-to-left script. There is no toggle, because a toggle invites judging a translation with the source hidden."
+  },
+  {
+    "id": "03_correction",
+    "title": "The verdict travels",
+    "text": "A correction is written against the source, and the verdict travels with the text into everything downstream. The linguist can also take a verdict back. An assertion made by a mis-click has to be retractable."
+  },
+  {
+    "id": "04_bench",
+    "title": "A bench, not a dashboard",
+    "text": "This is a bench, not a dashboard. The find tools collapse away entirely, and what remains is the stack of work."
+  },
+  {
+    "id": "05_disposition",
+    "title": "Decide where you read",
+    "text": "Thread decisions are made in the viewer, where the officer has actually read the thread. Flag it to a targeting officer, or discard it. The queue asks only one question: is this worked."
+  },
+  {
+    "id": "06_facet",
+    "title": "Narrow by what is in it",
+    "text": "Facets narrow the queue by what a thread contains. Selectors, passports, people, geography, documents. Anything flagged for a targeter can be pulled back out, because a handoff you cannot find again is a handoff you have lost."
+  },
+  {
+    "id": "07_search",
+    "title": "Four languages",
+    "text": "Search runs across four languages, in native script and across the translation layer, so a linguist can find in Arabic what was written in Arabic."
+  },
+  {
+    "id": "08_evidence",
+    "title": "Land on the evidence",
+    "text": "A hit lands on the evidence itself and flashes it, rather than dropping the analyst at the top of a long thread to hunt for the line they searched for."
+  },
+  {
+    "id": "09_stream",
+    "title": "Length costs nothing",
+    "text": "The stream is windowed, so thread length costs nothing. Measured against a two thousand message thread, a scroll repaints inside seventeen milliseconds against a two hundred millisecond budget. Order is chronological and reversible, because collection feeds do not arrive in order."
+  },
+  {
+    "id": "10_enrichment",
+    "title": "Enrich once",
+    "text": "Enrichment runs once for the whole thread. Translation, entity extraction, and a summary on demand. Against a live model gateway these calls take real seconds, so each one says that it is working."
+  },
+  {
+    "id": "11_document",
+    "title": "Documents",
+    "text": "Documents share the same surface. This is a five page customs declaration. Right to left, tabular, stamped and signed."
+  },
+  {
+    "id": "12_maximize",
+    "title": "Read the document",
+    "text": "The viewer opens to full screen and zooms, because a scan you cannot read is a scan you cannot exploit. Extracted text sits beside it, with an English gloss covering the whole document rather than captioning it."
+  },
+  {
+    "id": "13_paging",
+    "title": "Page and zoom",
+    "text": "Page through the manifest, and zoom in on the line items. This is the working posture for a document that carries its meaning in a table."
+  },
+  {
+    "id": "14_tagging",
+    "title": "Officer marks",
+    "text": "The officer's own triage marks become a searchable facet back in the queue, and a tag coined on one document is offered on the next. A tag that cannot be applied twice is not a tag."
+  },
+  {
+    "id": "15_promote",
+    "title": "The unit of gold",
+    "text": "Design work during performance changed what this produces. What was evaluated made clipped fragments. A linguist's product is not a fragment — it is the whole translated, reviewed thread, because the fragment loses the context that makes it mean anything. So only a fully reviewed thread can be promoted."
+  },
+  {
+    "id": "16_export",
+    "title": "One output",
+    "text": "Promoted threads are ordered by the officer and exported as full verdicted transcripts: every message with its original, its English, who certified it, and any note attached along the way. This removes behaviour that was evaluated. The original implementation is retained unmodified, and the removal reverts in a single commit if strict parity is preferred."
+  },
+  {
+    "id": "17_close",
+    "title": "What is proven",
+    "text": "Six containers: the application, and five single responsibility enrichment services behind frozen contracts, so production cutover is a configuration change one service at a time. Every push rebuilds the images, scans them, deploys them and smokes them. What is not proven: it has not yet been evidenced running in the target environment, and the live model gateway is wired but unexercised. Both are stated in the acceptance package rather than left to be discovered."
+  }
+]

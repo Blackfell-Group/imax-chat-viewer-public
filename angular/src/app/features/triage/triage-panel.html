@@ -1,0 +1,356 @@
+@if (collapsed()) {
+  <div class="rail rail-left">
+    <button
+      class="icon-btn"
+      type="button"
+      data-testid="nav-expand"
+      title="Expand triage panel"
+      (click)="collapsed.set(false)"
+    >
+      <mat-icon>chevron_right</mat-icon>
+    </button>
+  </div>
+} @else {
+  <div class="panel-body" data-testid="nav-panel">
+    <div
+      appPanelResize="right"
+      tabindex="0"
+      aria-label="Resize the Search and Triage panel"
+      data-testid="nav-resize"
+      [defaultWidth]="312"
+    ></div>
+    <header class="panel-header">
+      <span class="panel-title">Search &amp; Triage</span>
+      @if (active() || tagFilter() || flaggedOnly()) {
+        <button class="text-btn" type="button" data-testid="clear-search" (click)="clearAll()">
+          Clear
+        </button>
+      }
+      <button
+        class="icon-btn"
+        type="button"
+        [title]="showFind() ? 'Hide search & filters — show just my queue' : 'Show search & filters'"
+        data-testid="find-toggle"
+        [class.on]="showFind()"
+        (click)="toggleFind()"
+      >
+        <mat-icon>{{ showFind() ? 'search_off' : 'search' }}</mat-icon>
+      </button>
+      <button
+        class="icon-btn"
+        type="button"
+        title="Collapse triage panel"
+        (click)="collapsed.set(true)"
+      >
+        <mat-icon>chevron_left</mat-icon>
+      </button>
+    </header>
+
+    <div class="controls">
+      <div class="control-group">
+        <span class="control-label">My languages</span>
+        <div class="chip-row">
+          @for (l of scopeLangs; track l) {
+            <button
+              class="chip chip-primary"
+              type="button"
+              [class.on]="myLangs().includes(l)"
+              [attr.data-testid]="'mylang-' + l"
+              (click)="toggleMyLang(l)"
+            >
+              {{ langLabel[l] }}
+            </button>
+          }
+        </div>
+      </div>
+
+      <label class="sort-row">
+        <span class="control-label">Sort</span>
+        <select
+          class="sort-select"
+          data-testid="sort-select"
+          [value]="sort()"
+          [disabled]="active()"
+          (change)="sort.set($any($event.target).value)"
+        >
+          @for (o of sorts; track o.value) {
+            <option [value]="o.value">{{ o.label }}</option>
+          }
+        </select>
+      </label>
+
+      @if (showFind()) {
+      <input
+        class="search-input"
+        type="text"
+        dir="auto"
+        data-testid="thread-search"
+        [placeholder]="
+          mode() === 'entity'
+            ? 'Search names, selectors, passports…'
+            : 'Search all messages — any language…'
+        "
+        [value]="q()"
+        (input)="q.set($any($event.target).value)"
+      />
+
+      <mat-button-toggle-group
+        class="mode-toggle"
+        data-testid="mode-toggle"
+        hideSingleSelectionIndicator
+        [value]="mode()"
+        (change)="mode.set($event.value)"
+      >
+        <mat-button-toggle value="content">Content</mat-button-toggle>
+        <mat-button-toggle value="entity">Entity / Selector</mat-button-toggle>
+      </mat-button-toggle-group>
+
+      <div class="control-group">
+        <span class="control-label">Content type</span>
+        <div class="chip-row">
+          @for (t of types; track t.key) {
+            <button
+              class="chip chip-secondary"
+              type="button"
+              [class.on]="type() === t.key"
+              [attr.data-testid]="'type-' + t.key"
+              (click)="setType(t.key)"
+            >
+              <mat-icon class="chip-icon">{{ t.icon }}</mat-icon>
+              {{ t.label }}@if (typeCounts()[t.key] !== undefined) {&nbsp;{{ typeCounts()[t.key] }}}
+            </button>
+          }
+        </div>
+      </div>
+
+      <button
+        class="text-btn filters-btn"
+        type="button"
+        data-testid="filters-toggle"
+        (click)="showFilters.set(!showFilters())"
+      >
+        <mat-icon class="chip-icon">tune</mat-icon>
+        Date range
+        @if (from() || to()) {
+          · {{ from() || '…' }} → {{ to() || '…' }}
+        }
+      </button>
+      @if (showFilters()) {
+        <div class="date-row">
+          <label class="date-field">
+            <span>From</span>
+            <input
+              type="date"
+              data-testid="date-from"
+              [value]="from()"
+              (input)="from.set($any($event.target).value)"
+            />
+          </label>
+          <label class="date-field">
+            <span>To</span>
+            <input
+              type="date"
+              data-testid="date-to"
+              [value]="to()"
+              (input)="to.set($any($event.target).value)"
+            />
+          </label>
+        </div>
+      }
+
+      <div class="control-group">
+        <span class="control-label">Facets</span>
+        <div class="chip-row">
+          @for (f of facets; track f.key) {
+            <button
+              class="chip chip-facet"
+              type="button"
+              [class.on]="facet() === f.key"
+              [style.--chip-color]="f.cssVar"
+              [attr.data-testid]="'facet-' + f.key"
+              (click)="setFacet(f.key)"
+            >
+              {{ f.label }}@if (results()?.facetCounts?.[f.key] !== undefined) {&nbsp;{{ results()?.facetCounts?.[f.key] }}}
+            </button>
+          }
+        </div>
+      </div>
+
+      @if (flaggedCount() > 0) {
+        <div class="control-group">
+          <span class="control-label">Handoff — flagged for a targeting officer</span>
+          <div class="chip-row">
+            <button
+              class="chip chip-secondary flagged-chip"
+              type="button"
+              [class.on]="flaggedOnly()"
+              data-testid="facet-flagged"
+              [title]="flaggedOnly() ? 'Show all threads' : 'Show only threads flagged for a targeter'"
+              (click)="toggleFlaggedOnly()"
+            >
+              <mat-icon class="chip-icon">flag</mat-icon>
+              Flagged {{ flaggedCount() }}
+            </button>
+          </div>
+        </div>
+      }
+
+      @if (officerTags().length > 0) {
+        <div class="control-group">
+          <span class="control-label">Officer tags — your triage marks</span>
+          <div class="chip-row">
+            @for (tag of officerTags(); track tag) {
+              <button
+                class="chip chip-secondary"
+                type="button"
+                [class.on]="tagFilter() === tag"
+                [attr.data-testid]="'officertag-' + tag"
+                (click)="setTagFilter(tag)"
+              >
+                <mat-icon class="chip-icon">sell</mat-icon>
+                {{ tag }} {{ session.tagIndex()[tag].docs }}
+              </button>
+            }
+          </div>
+        </div>
+      }
+
+      <div class="control-group">
+        <span class="control-label">Groups — geo-fences &amp; watchlists</span>
+        <div class="chip-row">
+          @for (g of groups(); track g.id) {
+            <button
+              class="chip chip-facet"
+              type="button"
+              [class.on]="group() === g.id"
+              [style.--chip-color]="
+                g.kind === 'geofence' ? 'var(--entity-geo)' : 'var(--entity-phone)'
+              "
+              [attr.data-testid]="'group-' + g.id"
+              (click)="setGroup(g.id)"
+            >
+              <mat-icon class="chip-icon">{{ g.kind === 'geofence' ? 'public' : 'sell' }}</mat-icon>
+              {{ g.label }}
+            </button>
+          }
+        </div>
+      </div>
+      }
+    </div>
+
+    @if (active()) {
+      <div class="queue-header">
+        <span class="queue-stats" data-testid="search-stats">{{ statsLine() }}</span>
+      </div>
+      <div class="thread-list">
+        @if (results() && visibleHits().length === 0) {
+          <p class="stack-clear">No messages match the current filters.</p>
+        }
+        @for (hit of visibleHits(); track hit.messageId) {
+          <div
+            class="hit-row"
+            role="button"
+            tabindex="0"
+            [attr.data-testid]="'hit-' + hit.messageId"
+            (click)="select(hit.thread, hit.messageId)"
+            (keydown.enter)="select(hit.thread, hit.messageId)"
+          >
+            <div class="thread-title-row">
+              <mat-icon class="type-icon">{{ typeIcon[hit.contentType] }}</mat-icon>
+              <span class="hit-title">{{ hit.thread.title }}</span>
+              <span class="hit-date">{{ hit.ts.slice(0, 10) }}</span>
+            </div>
+            @if (hit.entity) {
+              <span class="entity-chip" [style.--chip-color]="'var(--entity-' + hit.entity.type + ')'">
+                {{ hit.entity.type }}: {{ hit.entity.text }}
+              </span>
+            }
+            <app-snippet-highlight
+              [text]="hit.snippet"
+              [q]="hit.field === 'text' || hit.field === 'translation' ? q().trim() : ''"
+              [dir]="hit.dir"
+            />
+            <div class="hit-meta-row">
+              <span class="meta-chip outlined">{{ hit.lang.toUpperCase() }}</span>
+              @if (hit.field === 'translation') {
+                <span class="meta-chip translation-badge">matched in EN translation</span>
+              }
+              <span class="hit-sender">&#64;{{ hit.sender }}</span>
+            </div>
+          </div>
+        }
+      </div>
+    } @else {
+      <div class="queue-header">
+        <span class="queue-stats" data-testid="queue-stats">
+          {{ queueMode() ? 'Queue' : 'All' }} · {{ newCount() }} new · {{ workedCount() }} worked
+        </span>
+        <button
+          class="text-btn"
+          type="button"
+          data-testid="queue-toggle"
+          (click)="queueMode.set(!queueMode())"
+        >
+          {{ queueMode() ? 'Show all' : 'Queue only' }}
+        </button>
+      </div>
+      <div class="queue-progress" data-testid="queue-progress">
+        <div class="queue-progress-bar">
+          <div
+            class="queue-progress-fill"
+            [style.width.%]="threads().length ? (workedCount() / threads().length) * 100 : 0"
+          ></div>
+        </div>
+        <span>{{ workedCount() }}/{{ threads().length }} worked</span>
+      </div>
+
+      <div class="thread-list">
+        @if (visibleThreads().length === 0) {
+          <p class="stack-clear" data-testid="stack-clear">
+            Queue clear — no unworked items in scope.
+          </p>
+        }
+        @for (t of visibleThreads(); track t.threadId) {
+          <div
+            class="thread-row"
+            role="button"
+            tabindex="0"
+            [class.selected]="triage.selectedThread()?.threadId === t.threadId"
+            [class.discarded]="dispo()[t.threadId] === 'discarded'"
+            [attr.data-testid]="'thread-' + t.threadId"
+            (click)="select(t)"
+            (keydown.enter)="select(t)"
+          >
+            <div class="thread-title-row">
+              <mat-icon class="type-icon">{{ typeIcon[t.contentType] }}</mat-icon>
+              <span class="thread-title">{{ t.title }}</span>
+              @if (t.contentType !== 'document' && t.hasAttachment) {
+                <mat-icon
+                  class="hasdoc-icon"
+                  [attr.data-testid]="'hasdoc-' + t.threadId"
+                  title="Contains a document"
+                >attach_file</mat-icon>
+              }
+              @if (dispo()[t.threadId] === 'reviewed') {
+                <span class="dispo-badge badge-reviewed">reviewed</span>
+              }
+              @if (dispo()[t.threadId] === 'flagged') {
+                <span class="dispo-badge badge-flagged">flagged</span>
+              }
+            </div>
+            <!-- The stack has no buttons (hcd/one_output_model.md): done
+                 means promoted to gold, decided in the viewer strip. Badges
+                 report state; the rows are just the queue. -->
+            <div class="thread-meta-row">
+              <span class="meta-chip">{{ t.network }}</span>
+              @for (l of t.languages; track l) {
+                <span class="meta-chip outlined">{{ l.toUpperCase() }}</span>
+              }
+              <span class="msg-count">{{ t.messageCount }}</span>
+            </div>
+          </div>
+        }
+      </div>
+    }
+  </div>
+}

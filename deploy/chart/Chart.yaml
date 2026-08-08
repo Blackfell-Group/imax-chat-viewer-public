@@ -1,0 +1,14 @@
+apiVersion: v2
+name: imax
+description: IMAX Triage Workspace — Angular SPA on an Express edge, with five mock enrichment services
+type: application
+
+# Chart version moves when the packaging changes; appVersion tracks the image
+# tag. They are deliberately separate: re-templating a deployment is not the
+# same event as shipping new application code, and ArgoCD shows both.
+version: 0.1.0
+appVersion: "0.1.0"
+
+keywords: [imax, triage, angular, prototype]
+maintainers:
+  - name: River Hawk Consulting, LLC

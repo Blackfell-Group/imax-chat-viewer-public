@@ -1,0 +1,36 @@
+{
+  "name": "imax",
+  "private": true,
+  "version": "0.1.0",
+  "description": "IMAX chat-viewer prototype (River Hawk Consulting) - self-contained SPA + mock enrichment services",
+  "scripts": {
+    "dev": "concurrently -k \"node server.js\" \"vite\"",
+    "mocks": "node server.js",
+    "build": "./build-app.sh",
+    "preview": "vite preview",
+    "test": "playwright test --config playwright.config.js",
+    "dev:ng": "concurrently -k \"node server.js\" \"npm --prefix angular start\"",
+    "test:ng": "playwright test --config playwright.ng.config.js shell.spec.js services.spec.js ng/",
+    "preflight:airgap": "./scripts/preflight-airgap.sh",
+    "bundle:airgap": "./deploy/make-offline-bundle.sh",
+    "fonts:vendor": "node scripts/vendor-fonts.js",
+    "test:node": "node --test tests/node/*.test.js"
+  },
+  "dependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.0",
+    "@fontsource/roboto": "^5.2.5",
+    "@mui/icons-material": "^6.1.6",
+    "@mui/material": "^6.1.6",
+    "express": "^4.21.2",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^6.28.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.49.0",
+    "@vitejs/plugin-react": "^4.3.4",
+    "concurrently": "^9.1.0",
+    "vite": "^5.4.10"
+  }
+}

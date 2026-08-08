@@ -1,0 +1,269 @@
+.bubble {
+  padding: 10px;
+  margin-bottom: 8px;
+  border: 1px solid #233040;
+  border-radius: 4px;
+  background: #151c24;
+  transition:
+    border-color 0.4s,
+    box-shadow 0.4s;
+
+  &.foreign {
+    background: #182130;
+  }
+
+  &.flash {
+    border-color: var(--primary);
+    box-shadow:
+      0 0 0 1px #4da3ff,
+      0 0 14px rgb(77 163 255 / 35%);
+  }
+
+  // Review state at a glance: the linguist (and the CMO scanning the thread)
+  // sees section-by-section progress toward gold-ready without reading badges.
+  &.reviewed-confirmed {
+    border-left: 3px solid var(--entity-geo);
+  }
+
+  &.reviewed-edited {
+    border-left: 3px solid var(--entity-passport);
+  }
+
+  &.needs-review {
+    border-left: 3px dashed #4a5666;
+  }
+}
+
+.bubble-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+
+  .sender {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--primary);
+  }
+
+  .ts {
+    font-size: 11px;
+    color: var(--text-dim);
+  }
+
+  .meta-chip {
+    height: 16px;
+    padding: 0 6px;
+    border-radius: 8px;
+    border: 1px solid #3a4656;
+    font-size: 9px;
+    line-height: 16px;
+  }
+
+  .spacer {
+    flex: 1;
+  }
+}
+
+.body-text {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.7;
+
+  &.rtl {
+    text-align: right;
+  }
+}
+
+// The persistent source line in bilingual view: quiet, quoted, correctly
+// directed — the original never leaves the screen while its translation shows.
+.original-text {
+  margin: 4px 0 0;
+  padding: 2px 8px;
+  border-left: 2px solid #3a4656;
+  color: var(--text-dim);
+  font-size: 12px;
+  line-height: 1.6;
+
+  &.rtl {
+    text-align: right;
+    border-left: none;
+    border-right: 2px solid #3a4656;
+    padding: 2px 8px;
+  }
+}
+
+.translated-badge {
+  background: #28405e;
+  border: none !important;
+  color: var(--text);
+
+  &.reviewed {
+    background: #2e6b4a;
+  }
+}
+
+.action-btn {
+  border: none;
+  background: transparent;
+  padding: 2px;
+  cursor: pointer;
+  color: var(--text-dim);
+  line-height: 0;
+
+  mat-icon {
+    font-size: 15px;
+    width: 15px;
+    height: 15px;
+  }
+
+  &:hover {
+    color: var(--text);
+  }
+
+  &.confirmed {
+    color: var(--entity-geo);
+  }
+
+  &.edited {
+    color: var(--entity-passport);
+  }
+
+  &.has-note {
+    color: var(--secondary);
+  }
+}
+
+.edit-block {
+  margin: 4px 0;
+
+  .edit-area {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 8px;
+    border: 1px solid #3a4656;
+    border-radius: 4px;
+    background: transparent;
+    color: var(--text);
+    font-family: inherit;
+    font-size: 12.5px;
+    resize: vertical;
+
+    &:focus {
+      outline: none;
+      border-color: var(--primary);
+    }
+  }
+
+  .edit-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 4px;
+  }
+}
+
+.solid-btn {
+  border: none;
+  border-radius: 4px;
+  padding: 4px 10px;
+  background: var(--primary);
+  color: #10151b;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.text-btn {
+  border: none;
+  background: transparent;
+  color: var(--text-dim);
+  font-size: 11px;
+  cursor: pointer;
+
+  &.danger {
+    color: #f77;
+  }
+}
+
+.entity-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 8px;
+
+  .no-entities {
+    color: var(--text-dim);
+    font-size: 11px;
+  }
+}
+
+.entity-chip-btn {
+  height: 20px;
+  padding: 0 8px;
+  border: none;
+  border-radius: 10px;
+  background: var(--chip-color);
+  color: #10151b;
+  font-size: 10px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.note-display {
+  margin-top: 8px;
+  padding: 8px;
+  border: 1px solid #3a4a6b;
+  border-radius: 4px;
+  background: #1a2233;
+
+  .note-header {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .note-icon {
+    font-size: 12px;
+    width: 12px;
+    height: 12px;
+    color: var(--secondary);
+  }
+
+  .note-label {
+    flex: 1;
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--secondary);
+  }
+
+  .note-text {
+    margin: 2px 0 0;
+    font-size: 12.5px;
+    line-height: 1.5;
+  }
+}
+
+.attachment-row {
+  margin-top: 6px;
+}
+
+.attachment-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 22px;
+  padding: 0 8px;
+  border: 1px solid var(--secondary);
+  border-radius: 11px;
+  background: transparent;
+  color: var(--text);
+  font-size: 10px;
+  cursor: pointer;
+
+  .chip-icon {
+    font-size: 13px;
+    width: 13px;
+    height: 13px;
+    color: var(--secondary);
+  }
+}

@@ -1,0 +1,32 @@
+# imax-mock-translation: mount the certificate, switch to TLS, health-check over HTTPS.
+#
+# JSON6902, not a strategic merge: envFrom and volumeMounts are lists with no
+# merge key, so a strategic merge REPLACES them — which would silently drop the
+# model-gateway and auth configuration this pod already reads. These operations
+# append.
+- op: add
+  path: /spec/template/spec/containers/0/envFrom/-
+  value:
+    configMapRef:
+      name: imax-tls-config
+- op: add
+  path: /spec/template/spec/volumes/-
+  value:
+    name: tls
+    secret:
+      secretName: imax-tls
+      # NOT optional: with this overlay applied a missing Secret must stop the
+      # rollout, never serve plaintext on a port the cluster believes is TLS.
+      optional: false
+- op: add
+  path: /spec/template/spec/containers/0/volumeMounts/-
+  value:
+    name: tls
+    mountPath: /etc/tls
+    readOnly: true
+- op: add
+  path: /spec/template/spec/containers/0/livenessProbe/httpGet/scheme
+  value: HTTPS
+- op: add
+  path: /spec/template/spec/containers/0/readinessProbe/httpGet/scheme
+  value: HTTPS

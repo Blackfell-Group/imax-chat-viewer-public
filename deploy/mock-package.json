@@ -1,0 +1,9 @@
+{
+  "name": "imax-mock-service",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Single-service pod runtime for the IMAX mock enrichment layer",
+  "dependencies": {
+    "express": "4.21.2"
+  }
+}

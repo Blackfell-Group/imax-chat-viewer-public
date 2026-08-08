@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="1132" viewBox="0 0 400 566">
+  <rect width="400" height="566" fill="#f6f2e7"/>
+  <rect x="14" y="14" width="372" height="538" fill="none" stroke="#8a7f66" stroke-width="2"/>
+  <text x="360" y="46" text-anchor="start" direction="rtl" font-family="'Noto Naskh Arabic','Noto Sans Arabic','Geeza Pro','Amiri','Scheherazade New',serif" font-size="11" font-weight="normal" fill="#8a7f66">الهيئة العامة للجمارك</text>
+  <text x="360" y="62" text-anchor="start" direction="rtl" font-family="'Noto Naskh Arabic','Noto Sans Arabic','Geeza Pro','Amiri','Scheherazade New',serif" font-size="10" font-weight="normal" fill="#8a7f66">ميناء مصراتة — قسم الوارد</text>
+  <line x1="40" y1="72" x2="360" y2="72" stroke="#8a7f66" stroke-width="1"/>
+  <text x="360" y="98" text-anchor="start" direction="rtl" font-family="'Noto Naskh Arabic','Noto Sans Arabic','Geeza Pro','Amiri','Scheherazade New',serif" font-size="17" font-weight="bold" fill="#3a3428">إقرار جمركي للوارد</text>
+  <text x="360" y="118" text-anchor="start" direction="rtl" font-family="'Noto Naskh Arabic','Noto Sans Arabic','Geeza Pro','Amiri','Scheherazade New',serif" font-size="12" font-weight="normal" fill="#6b6250">نموذج ج-١٤ / بيان تفصيلي</text>
+  <text x="360" y="160" text-anchor="start" direction="rtl" font-family="'Noto Naskh Arabic','Noto Sans Arabic','Geeza Pro','Amiri','Scheherazade New',serif" font-size="12" font-weight="bold" fill="#3a3428">رقم الإقرار:</text>
+  <text x="250" y="160" text-anchor="end" direction="ltr" font-family="'Courier New',Courier,monospace" font-size="12" fill="#3a3428">JM-2026-0703-0418</text>
+  <text x="360" y="187" text-anchor="start" direction="rtl" font-family="'Noto Naskh Arabic','Noto Sans Arabic','Geeza Pro','Amiri','Scheherazade New',serif" font-size="12" font-weight="bold" fill="#3a3428">التاريخ:</text>
+  <text x="250" y="187" text-anchor="start" direction="rtl" font-family="'Noto Naskh Arabic','Noto Sans Arabic','Geeza Pro','Amiri','Scheherazade New',serif" font-size="12" font-weight="normal" fill="#3a3428">٣ يوليو ٢٠٢٦</text>
+  <text x="360" y="214" text-anchor="start" direction="rtl" font-family="'Noto Naskh Arabic','Noto Sans Arabic','Geeza Pro','Amiri','Scheherazade New',serif" font-size="12" font-weight="bold" fill="#3a3428">المصدّر:</text>
+  <text x="250" y="214" text-anchor="start" direction="rtl" font-family="'Noto Naskh Arabic','Noto Sans Arabic','Geeza Pro','Amiri','Scheherazade New',serif" font-size="12" font-weight="normal" fill="#3a3428">شركة الكريم للتجارة</text>
+  <text x="360" y="241" text-anchor="start" direction="rtl" font-family="'Noto Naskh Arabic','Noto Sans Arabic','Geeza Pro','Amiri','Scheherazade New',serif" font-size="12" font-weight="bold" fill="#3a3428">المستورد:</text>
+  <text x="250" y="241" text-anchor="start" direction="rtl" font-family="'Noto Naskh Arabic','Noto Sans Arabic','Geeza Pro','Amiri','Scheherazade New',serif" font-size="12" font-weight="normal" fill="#3a3428">مؤسسة النخيل للاستيراد</text>
+  <text x="360" y="268" text-anchor="start" direction="rtl" font-family="'Noto Naskh Arabic','Noto Sans Arabic','Geeza Pro','Amiri','Scheherazade New',serif" font-size="12" font-weight="bold" fill="#3a3428">السفينة:</text>
+  <text x="250" y="268" text-anchor="start" direction="rtl" font-family="'Noto Naskh Arabic','Noto Sans Arabic','Geeza Pro','Amiri','Scheherazade New',serif" font-size="12" font-weight="normal" fill="#3a3428">نجمة سرت</text>
+  <text x="360" y="295" text-anchor="start" direction="rtl" font-family="'Noto Naskh Arabic','Noto Sans Arabic','Geeza Pro','Amiri','Scheherazade New',serif" font-size="12" font-weight="bold" fill="#3a3428">رقم الرحلة:</text>
+  <text x="250" y="295" text-anchor="end" direction="ltr" font-family="'Courier New',Courier,monospace" font-size="12" fill="#3a3428">NS-114</text>
+  <text x="360" y="322" text-anchor="start" direction="rtl" font-family="'Noto Naskh Arabic','Noto Sans Arabic','Geeza Pro','Amiri','Scheherazade New',serif" font-size="12" font-weight="bold" fill="#3a3428">بوليصة الشحن:</text>
+  <text x="250" y="322" text-anchor="end" direction="ltr" font-family="'Courier New',Courier,monospace" font-size="12" fill="#3a3428">GW-2026-0630-114</text>
+  <text x="360" y="349" text-anchor="start" direction="rtl" font-family="'Noto Naskh Arabic','Noto Sans Arabic','Geeza Pro','Amiri','Scheherazade New',serif" font-size="12" font-weight="bold" fill="#3a3428">ميناء الشحن:</text>
+  <text x="250" y="349" text-anchor="start" direction="rtl" font-family="'Noto Naskh Arabic','Noto Sans Arabic','Geeza Pro','Amiri','Scheherazade New',serif" font-size="12" font-weight="normal" fill="#3a3428">مصراتة</text>
+  <text x="360" y="376" text-anchor="start" direction="rtl" font-family="'Noto Naskh Arabic','Noto Sans Arabic','Geeza Pro','Amiri','Scheherazade New',serif" font-size="12" font-weight="bold" fill="#3a3428">ميناء التفريغ:</text>
+  <text x="250" y="376" text-anchor="start" direction="rtl" font-family="'Noto Naskh Arabic','Noto Sans Arabic','Geeza Pro','Amiri','Scheherazade New',serif" font-size="12" font-weight="normal" fill="#3a3428">طرابلس</text>
+  <text x="360" y="403" text-anchor="start" direction="rtl" font-family="'Noto Naskh Arabic','Noto Sans Arabic','Geeza Pro','Amiri','Scheherazade New',serif" font-size="12" font-weight="bold" fill="#3a3428">عدد الطرود:</text>
+  <text x="250" y="403" text-anchor="start" direction="rtl" font-family="'Noto Naskh Arabic','Noto Sans Arabic','Geeza Pro','Amiri','Scheherazade New',serif" font-size="12" font-weight="normal" fill="#3a3428">٤٢ طرد</text>
+  <text x="360" y="430" text-anchor="start" direction="rtl" font-family="'Noto Naskh Arabic','Noto Sans Arabic','Geeza Pro','Amiri','Scheherazade New',serif" font-size="12" font-weight="bold" fill="#3a3428">الوزن الإجمالي:</text>
+  <text x="250" y="430" text-anchor="start" direction="rtl" font-family="'Noto Naskh Arabic','Noto Sans Arabic','Geeza Pro','Amiri','Scheherazade New',serif" font-size="12" font-weight="normal" fill="#3a3428">٦٣٠٠ كغم</text>
+  <text x="360" y="457" text-anchor="start" direction="rtl" font-family="'Noto Naskh Arabic','Noto Sans Arabic','Geeza Pro','Amiri','Scheherazade New',serif" font-size="12" font-weight="bold" fill="#3a3428">نوع البضاعة:</text>
+  <text x="250" y="457" text-anchor="start" direction="rtl" font-family="'Noto Naskh Arabic','Noto Sans Arabic','Geeza Pro','Amiri','Scheherazade New',serif" font-size="12" font-weight="normal" fill="#3a3428">قطع غيار آليات</text>
+  <g transform="rotate(-8 300 500)">
+  <ellipse cx="300" cy="500" rx="54" ry="29" fill="none" stroke="#7a4d8f" stroke-width="2" opacity="0.75"/>
+  <text x="300" y="497" text-anchor="middle" direction="rtl" font-family="'Noto Naskh Arabic','Noto Sans Arabic','Geeza Pro','Amiri','Scheherazade New',serif" font-size="10" font-weight="normal" fill="#7a4d8f">جمارك مصراتة</text>
+  <text x="300" y="511" text-anchor="middle" direction="ltr" font-family="'Courier New',Courier,monospace" font-size="8.5" fill="#7a4d8f">03-07-2026</text>
+  </g>
+  <line x1="40" y1="520" x2="360" y2="520" stroke="#8a7f66" stroke-width="1"/>
+  <text x="360" y="536" text-anchor="start" direction="rtl" font-family="'Noto Naskh Arabic','Noto Sans Arabic','Geeza Pro','Amiri','Scheherazade New',serif" font-size="9" font-weight="normal" fill="#8a7f66">إقرار جمركي رقم JM-2026-0703-0418</text>
+  <text x="70" y="536" text-anchor="middle" direction="ltr" font-family="'Courier New',Courier,monospace" font-size="9" fill="#8a7f66">1 / 5</text>
+  </svg>

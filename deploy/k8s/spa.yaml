@@ -1,0 +1,88 @@
+# imax-spa: the Angular bundle on an Express edge — the only user-facing
+# service. Exposure to users (ingress / route) is the target environment-side, and that
+# front is what authenticates the caller and injects the identity headers
+# this pod trusts. For validation use
+# `kubectl port-forward svc/imax-spa 8443:8443`.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: imax-spa
+  labels:
+    app: imax-spa
+    part-of: imax-chat-viewer
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: imax-spa
+  template:
+    metadata:
+      labels:
+        app: imax-spa
+        part-of: imax-chat-viewer
+    spec:
+      # Named account rather than `default`. Grants nothing here; it is the
+      # identity the tls-awssm overlay attaches an IAM role to. See
+      # serviceaccount.yaml.
+      serviceAccountName: imax
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: imax-spa
+          image: imax-spa:0.1.0
+          imagePullPolicy: IfNotPresent
+          # Identity header names are deployment-specific — see
+          # the imax-auth ConfigMap. Absent ⇒ headers parsed, nothing enforced.
+          envFrom:
+            - configMapRef:
+                name: imax-auth
+                optional: true
+          # Restricted Pod Security Standard. Without these three, an
+          # enforcing namespace rejects the pod outright — the FAQ's "least
+          # privilege within containers" is admission policy, not advice.
+          # runAsUser is deliberately NOT pinned: a namespace that assigns its
+          # own UID range must be free to do so, and both images tolerate an
+          # arbitrary non-root UID.
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: false
+            capabilities:
+              drop: ["ALL"]
+          ports:
+            - containerPort: 8443
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 8443
+            initialDelaySeconds: 3
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 8443
+            initialDelaySeconds: 2
+            periodSeconds: 5
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 250m
+              memory: 256Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: imax-spa
+  labels:
+    app: imax-spa
+    part-of: imax-chat-viewer
+spec:
+  type: ClusterIP
+  selector:
+    app: imax-spa
+  ports:
+    - port: 8443
+      targetPort: 8443

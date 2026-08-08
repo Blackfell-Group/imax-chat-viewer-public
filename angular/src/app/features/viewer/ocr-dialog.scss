@@ -1,0 +1,514 @@
+.ocr-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgb(0 0 0 / 55%);
+  z-index: 20;
+  border: none;
+}
+
+.ocr-modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  // Width/height are bound from the component so the officer can drag them;
+  // these are the ceiling, not the size.
+  max-width: calc(100vw - 24px);
+  max-height: calc(100vh - 24px);
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--paper);
+  z-index: 21;
+}
+
+.ocr-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--line);
+
+  .title-text {
+    flex: 1;
+    font-size: 13px;
+    font-weight: 600;
+  }
+}
+
+.ocr-modal.maximized {
+  width: 98vw;
+  height: 96vh;
+}
+
+.ocr-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  padding: 16px;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+// Grab strip between the scan and the text below it. Horizontal now — the
+// panes stack.
+.split-handle {
+  flex: 0 0 10px;
+  margin: 3px 0;
+  cursor: row-resize;
+  border-radius: 3px;
+  background: transparent;
+
+  &:hover,
+  &:active {
+    background: var(--line);
+  }
+}
+
+// Bottom-right corner grip.
+.resize-grip {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 16px;
+  height: 16px;
+  cursor: nwse-resize;
+  background: linear-gradient(
+    135deg,
+    transparent 0 50%,
+    var(--line) 50% 60%,
+    transparent 60% 70%,
+    var(--line) 70% 80%,
+    transparent 80%
+  );
+}
+
+.zoom-group {
+  display: inline-flex;
+  gap: 2px;
+  margin-left: auto;
+
+  .action-btn.on {
+    color: var(--primary);
+  }
+}
+
+.ocr-image-pane {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-height: 0;
+}
+
+// The scan fills whatever room the pane has. It used to be capped at 420px
+// regardless of viewer size, which is why the documents read as too small no
+// matter what the officer did. Overflow scrolls so a zoomed scan can be
+// panned rather than clipped.
+.ocr-image {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  background: #0c1116;
+  border-radius: 4px;
+  padding: 8px;
+  overflow: auto;
+
+  img {
+    display: block;
+    object-fit: contain;
+  }
+}
+
+.pager {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  .pager-indicator {
+    color: var(--text-dim);
+    font-size: 11px;
+    min-width: 80px;
+    text-align: center;
+  }
+}
+
+.ocr-text {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  border-top: 1px solid var(--line);
+  padding-top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.text-section {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+// The original, one document line per row. Numbered so an officer reading the
+// scan against the text can say which line they mean.
+ol.blocks {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: ocrline;
+
+  .block-line {
+    counter-increment: ocrline;
+    display: flex;
+    gap: 10px;
+    padding: 3px 0;
+    border-bottom: 1px solid color-mix(in srgb, var(--line) 45%, transparent);
+    line-height: 1.6;
+
+    &::before {
+      content: counter(ocrline);
+      flex: 0 0 1.6em;
+      text-align: right;
+      color: var(--text-dim);
+      font-size: 10px;
+      font-variant-numeric: tabular-nums;
+      padding-top: 3px;
+      user-select: none;
+    }
+
+    &:last-child {
+      border-bottom: none;
+    }
+  }
+}
+
+.caption {
+  color: var(--text-dim);
+  font-size: 10px;
+  letter-spacing: 0.5px;
+
+  &.strong {
+    font-weight: 700;
+  }
+}
+
+.blocks {
+  margin-top: 8px;
+
+  .block-line {
+    margin: 0 0 4px;
+    font-family: monospace;
+    font-size: 12.5px;
+  }
+}
+
+.gloss {
+  margin-top: 12px;
+  padding-top: 8px;
+  border-top: 1px solid var(--line);
+
+  .gloss-header {
+    display: flex;
+    align-items: center;
+
+    .caption {
+      flex: 1;
+    }
+  }
+
+  .gloss-text {
+    margin: 4px 0 0;
+    font-size: 12.5px;
+    line-height: 1.5;
+    color: var(--text-dim);
+  }
+}
+
+.doc-annotation {
+  padding: 12px 24px;
+  border-top: 1px solid var(--line);
+  background: #10151b;
+}
+
+.tag-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 6px;
+
+  .tag-icon {
+    font-size: 14px;
+    width: 14px;
+    height: 14px;
+    color: var(--secondary);
+  }
+}
+
+.chip {
+  height: 20px;
+  padding: 0 8px;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--text);
+  font-size: 10px;
+  font-weight: 600;
+  cursor: pointer;
+
+  &.chip-secondary {
+    border: 1px solid var(--secondary);
+
+    &.on {
+      background: var(--secondary);
+      color: #10151b;
+    }
+  }
+}
+
+.tag-input {
+  width: 84px;
+  padding: 3px 6px;
+  border: none;
+  border-bottom: 1px solid #3a4656;
+  background: transparent;
+  color: var(--text);
+  font-size: 11px;
+
+  &:focus {
+    outline: none;
+    border-bottom-color: var(--primary);
+  }
+}
+
+.action-btn {
+  border: none;
+  background: transparent;
+  padding: 2px;
+  cursor: pointer;
+  color: var(--text-dim);
+  line-height: 0;
+
+  mat-icon {
+    font-size: 15px;
+    width: 15px;
+    height: 15px;
+  }
+
+  &:hover:not(:disabled) {
+    color: var(--text);
+  }
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: default;
+  }
+}
+
+.edit-block {
+  margin-top: 8px;
+
+  .edit-area {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 8px;
+    border: 1px solid #3a4656;
+    border-radius: 4px;
+    background: transparent;
+    color: var(--text);
+    font-family: inherit;
+    font-size: 12.5px;
+    resize: vertical;
+
+    &:focus {
+      outline: none;
+      border-color: var(--primary);
+    }
+  }
+
+  .edit-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 4px;
+  }
+}
+
+.solid-btn {
+  border: none;
+  border-radius: 4px;
+  padding: 4px 10px;
+  background: var(--primary);
+  color: #10151b;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.text-btn {
+  border: none;
+  background: transparent;
+  color: var(--text-dim);
+  font-size: 11px;
+  cursor: pointer;
+
+  &.danger {
+    color: #f77;
+  }
+
+  &.add-note {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-top: 6px;
+  }
+}
+
+.note-icon {
+  font-size: 12px;
+  width: 12px;
+  height: 12px;
+  color: var(--secondary);
+}
+
+.note-display {
+  margin-top: 8px;
+  padding: 8px;
+  border: 1px solid #3a4a6b;
+  border-radius: 4px;
+  background: #1a2233;
+
+  .note-header {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .note-label {
+    flex: 1;
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--secondary);
+  }
+
+  .note-text {
+    margin: 2px 0 0;
+    font-size: 12.5px;
+    line-height: 1.5;
+  }
+}
+
+// Tag entry: the field plus an explicit Add, because Enter-only meant a typed
+// tag vanished on click-away with nothing on screen saying otherwise.
+.tag-entry {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.chip-add {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: default;
+  }
+
+  .add-icon {
+    font-size: 14px;
+    width: 14px;
+    height: 14px;
+  }
+}
+
+// The scan scrolls when zoomed past the pane. Anchored top-left rather than
+// centred so a fit-width page starts at the top of the document.
+.ocr-image {
+  align-items: flex-start;
+  justify-content: center;
+}
+
+.gloss-header {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+
+  .spacer { flex: 1; }
+
+  .action-btn.confirmed { color: var(--ok, #4caf7d); }
+  .action-btn.edited { color: var(--warn, #d98a8a); }
+}
+
+// A reviewed gloss carries the same edge the message bubbles use, so the state
+// reads the same way in both places.
+.text-section.gloss.reviewed {
+  border-left: 3px solid var(--ok, #4caf7d);
+  padding-left: 10px;
+}
+
+.edit-area {
+  width: 100%;
+  box-sizing: border-box;
+  resize: vertical;
+  font: inherit;
+  line-height: 1.55;
+  padding: 8px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: var(--paper-dim, #0c1116);
+  color: var(--text);
+}
+
+.edit-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+// Line-by-line bilingual layout. The line number stays in the gutter (::before
+// on .block-line) and the two renderings share the rest of the row, so the eye
+// travels ACROSS one line instead of down two stacked blocks.
+.blocks.paired {
+  .block-line {
+    display: grid;
+    grid-template-columns: 1.6em 1fr 1fr;
+    align-items: start;
+    column-gap: 14px;
+  }
+
+  .block-src,
+  .block-en {
+    min-width: 0;          // let long lines wrap instead of forcing the row wide
+    overflow-wrap: anywhere;
+  }
+
+  .block-en {
+    color: var(--text-dim);
+    border-left: 1px solid color-mix(in srgb, var(--line) 60%, transparent);
+    padding-left: 12px;
+  }
+
+  // RTL source: the original takes the right-hand column, so it reads outward
+  // from the margin it occupies on the page. Explicit `order` rather than
+  // `direction: rtl` on the row, because the row also holds the line number and
+  // flipping the whole row would send the gutter to the right with it.
+  &.src-rtl {
+    .block-src { order: 3; }
+    .block-en { order: 2; }
+
+    .block-en {
+      border-left: 0;
+      border-right: 1px solid color-mix(in srgb, var(--line) 60%, transparent);
+      padding-left: 0;
+      padding-right: 12px;
+      text-align: left;
+    }
+
+    .block-src { text-align: right; }
+  }
+}

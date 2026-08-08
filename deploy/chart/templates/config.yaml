@@ -1,0 +1,85 @@
+{{/*
+All configuration in one file: three ConfigMaps and a Secret, each small, each
+read by envFrom. Kept together because they are the whole of what changes
+between environments — someone asking "what do I have to set" has one file to
+read rather than four.
+*/}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-auth
+  labels: {{- include "imax.labels" . | nindent 4 }}
+data:
+  AUTH_MODE: {{ .Values.auth.mode | quote }}
+  AUTH_HEADER_ID: {{ .Values.auth.headerId | quote }}
+  AUTH_HEADER_NAME: {{ .Values.auth.headerName | quote }}
+  AUTH_HEADER_GROUPS: {{ .Values.auth.headerGroups | quote }}
+  AUTH_HEADER_ORG: {{ .Values.auth.headerOrg | quote }}
+  AUTH_HEADER_TOKEN: {{ .Values.auth.headerToken | quote }}
+  AUTH_HEADER_ACCESS_TOKEN: {{ .Values.auth.headerAccessToken | quote }}
+  AUTH_CLAIM_ID: {{ .Values.auth.claimId | quote }}
+  AUTH_CLAIM_NAME: {{ .Values.auth.claimName | quote }}
+  AUTH_CLAIM_GROUPS: {{ .Values.auth.claimGroups | quote }}
+  AUTH_CLAIM_ORG: {{ .Values.auth.claimOrg | quote }}
+  AUTH_GROUP_SEPARATOR: {{ .Values.auth.groupSeparator | quote }}
+  AUTH_REQUIRED_GROUPS: {{ .Values.auth.requiredGroups | quote }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-model-gateway
+  labels: {{- include "imax.labels" . | nindent 4 }}
+data:
+  # Empty ⇒ fixtures. The endpoint lives here rather than in the Secret because
+  # a URL is not a credential: in a Secret it cannot be read back with kubectl
+  # get, cannot be diffed, and a typo means recreating the whole object.
+  MODEL_ENDPOINT: {{ .Values.modelGateway.endpoint | quote }}
+  MODEL_NAME: {{ .Values.modelGateway.name | quote }}
+  MODEL_TIMEOUT_MS: {{ .Values.modelGateway.timeoutMs | quote }}
+{{- if not .Values.modelGateway.existingSecret }}
+---
+# Placeholder so a fresh install succeeds before the real key exists. Replace
+# with a sealed secret, an ExternalSecret, or modelGateway.existingSecret —
+# never commit a live key to values.
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ .Release.Name }}-model-gateway
+  labels: {{- include "imax.labels" . | nindent 4 }}
+type: Opaque
+stringData:
+  MODEL_API_KEY: {{ .Values.modelGateway.apiKey | quote }}
+{{- end }}
+{{- if .Values.tls.enabled }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-tls-config
+  labels: {{- include "imax.labels" . | nindent 4 }}
+data:
+  # deploy/tls.js switches to https the moment these are readable.
+  TLS_CERT_FILE: /etc/tls/tls.crt
+  TLS_KEY_FILE: /etc/tls/tls.key
+  TLS_CA_FILE: /etc/tls/ca.pem
+  TLS_CLIENT_AUTH: {{ .Values.tls.clientAuth | quote }}
+  # The SPA edge dials the enrichment pods over TLS as well.
+  UPSTREAM_SCHEME: https
+{{- if eq .Values.tls.source "awssm" }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-tls-source
+  labels: {{- include "imax.labels" . | nindent 4 }}
+data:
+  AWS_REGION: {{ .Values.tls.awssm.region | quote }}
+  AWS_SECRETSMANAGER_ENDPOINT: {{ .Values.tls.awssm.endpoint | quote }}
+  AWS_STS_ENDPOINT: {{ .Values.tls.awssm.stsEndpoint | quote }}
+  # Two secrets: set both. One secret carrying cert AND key: set certSecret
+  # only. Payloads may be raw PEM, JSON, or base64 inside JSON — all detected.
+  TLS_CERT_SECRET: {{ .Values.tls.awssm.certSecret | quote }}
+  TLS_KEY_SECRET: {{ .Values.tls.awssm.keySecret | quote }}
+  TLS_CA_SECRET: {{ .Values.tls.awssm.caSecret | quote }}
+{{- end }}
+{{- end }}

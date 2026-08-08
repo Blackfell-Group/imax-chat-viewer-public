@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="380" height="380" viewBox="0 0 380 380">
+  <rect width="380" height="380" fill="#f5f1ee"/>
+  <rect x="14" y="14" width="352" height="352" fill="none" stroke="#9a7f6f" stroke-width="2"/>
+  <text x="190" y="58" text-anchor="middle" font-family="'PingFang SC','Noto Sans CJK SC',sans-serif" font-size="24" font-weight="bold" fill="#3a2f28">货物申报单</text>
+  <line x1="40" y1="74" x2="340" y2="74" stroke="#9a7f6f" stroke-width="1"/>
+  <g font-family="'PingFang SC','Noto Sans CJK SC',sans-serif" font-size="15" fill="#42352b">
+    <text x="40" y="110">申报号：LL-2026-0628-77</text>
+    <text x="40" y="144">船只：东海之星</text>
+    <text x="40" y="178">装货港：广州</text>
+    <text x="40" y="212">卸货港：香港</text>
+    <text x="40" y="246">收货人：陈伟明</text>
+    <text x="40" y="280">货物：58 箱 机械零件</text>
+    <text x="40" y="314">重量：7,400 公斤</text>
+    <text x="40" y="348">日期：2026 年 6 月 28 日</text>
+  </g>
+  <g transform="rotate(-8 300 300)">
+    <rect x="256" y="276" width="88" height="48" fill="none" stroke="#b0402f" stroke-width="2" opacity="0.7"/>
+    <text x="300" y="305" text-anchor="middle" font-family="'PingFang SC',sans-serif" font-size="13" fill="#b0402f" opacity="0.8">海关</text>
+  </g>
+</svg>

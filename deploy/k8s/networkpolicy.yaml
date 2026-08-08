@@ -1,0 +1,49 @@
+# Network restriction for the enrichment pods.
+#
+# The the target environment container guidance asks for this directly — "Restrict network
+# access for the container using tools like --network=none or security policies
+# within your orchestration platform" — and the package shipped without it.
+#
+# What this enforces: the five enrichment pods accept traffic on 5177 from the
+# SPA pod and nothing else. They are ClusterIP-only already, so this closes the
+# gap between "not exposed outside the cluster" and "not reachable by anything
+# else inside it".
+#
+# Egress is deliberately left open. The pods need DNS, and once the model
+# gateway is configured they need to reach it — and the gateway address is not
+# known here (it arrives in the Secret at deploy time). Tightening egress is the
+# right thing to do in the enclave, where that address is known; §6 of
+# AIRGAP.md has the shape to add.
+#
+# NOTE: enforcement requires a CNI that implements NetworkPolicy. The kind
+# cluster in CI uses kindnet, which does NOT, so CI proves this manifest applies
+# cleanly and nothing more. It is unenforced until it runs on a cluster with
+# Calico, Cilium, or equivalent — do not read a green pipeline as proof the
+# restriction is active.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: imax-enrichment-ingress
+  labels:
+    part-of: imax-chat-viewer
+spec:
+  podSelector:
+    matchExpressions:
+      - key: app
+        operator: In
+        values:
+          - imax-mock-search
+          - imax-mock-translation
+          - imax-mock-entities
+          - imax-mock-summarize
+          - imax-mock-ocr
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app: imax-spa
+      ports:
+        - protocol: TCP
+          port: 5177

@@ -1,0 +1,54 @@
+{{- if .Values.serviceAccount.create }}
+{{/*
+The pods call no Kubernetes API. This account exists so an IAM role can be
+attached to it — the initContainer that reads certificates from Secrets Manager
+authenticates as this. With roleArn empty the credential chain falls through to
+the node instance profile, so the same chart works under IRSA or without it.
+
+The role needs secretsmanager:GetSecretValue on the named secrets and nothing
+wider, plus kms:Decrypt if they use a customer-managed key — that last one
+presents as AccessDenied on a secret the role can demonstrably see, so it is
+worth asking about up front.
+*/}}
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ .Values.serviceAccount.name }}
+  labels: {{- include "imax.labels" . | nindent 4 }}
+  {{- with .Values.serviceAccount.roleArn }}
+  annotations:
+    eks.amazonaws.com/role-arn: {{ . | quote }}
+  {{- end }}
+{{- end }}
+{{- if .Values.networkPolicy.enabled }}
+---
+{{/*
+The enrichment services accept traffic only from the SPA pod. Restricting
+ingress to the SPA pod ITSELF is a platform-side control these manifests cannot
+express, and it is what makes trusting the front's identity headers safe — see
+AIRGAP.md §9.
+*/}}
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: imax-enrichment-ingress
+  labels: {{- include "imax.labels" . | nindent 4 }}
+spec:
+  podSelector:
+    matchExpressions:
+      - key: app
+        operator: In
+        values:
+        {{- range $svc := .Values.mocks.services }}
+          - imax-mock-{{ $svc }}
+        {{- end }}
+  policyTypes: [Ingress]
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app: imax-spa
+      ports:
+        - protocol: TCP
+          port: {{ .Values.mocks.port }}
+{{- end }}

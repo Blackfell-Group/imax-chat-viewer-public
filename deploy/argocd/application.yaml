@@ -1,0 +1,114 @@
+# ArgoCD Application for the IMAX chat-viewer prototype.
+#
+# This is the object the target environment actually applies — deployment there
+# is a declarative sync, not a command anyone runs, and there is no kubectl
+# against it. Shipping the manifest as a file rather than as a code block in a
+# README means it can be edited, diffed and applied instead of retyped.
+#
+#   1. Replace every <angle-bracket> value below. None of them can be known
+#      outside the enclave, and none requires a code change — see
+#      docs/architecture.md §10.
+#   2. kubectl apply -f deploy/argocd/application.yaml   (or commit it to the
+#      repository ArgoCD watches, if the environment is app-of-apps)
+#
+# Evidence for milestone M2 comes from this object once it syncs:
+#
+#   argocd app get imax -o yaml
+#
+# which carries the sync history (the TDD's "deployment log"), the health and
+# resource tree (its "running pods"), and the source repository and revision
+# (its "repo access") in one output.
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: imax
+  namespace: argocd
+  # Keep the Application itself if the project is ever deleted; removing the
+  # workloads should be a deliberate act, not a side effect.
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+
+  source:
+    repoURL: https://github.com/Blackfell-Group/imax-chat-viewer-public.git
+    # Pin to a tag rather than tracking main. A prototype under evaluation
+    # should not change under the evaluator because someone pushed.
+    targetRevision: v1.3.0-prototype
+    path: deploy/chart
+    helm:
+      values: |
+        image:
+          # Trailing slash matters — it is prefixed onto each image name.
+          registry: <internal-registry>/imax/
+
+        tls:
+          enabled: true
+          # awssm: an initContainer fetches the certificate and key at pod
+          # start onto an in-memory volume, so the private key never becomes a
+          # Kubernetes Secret. See docs/architecture.md §3.
+          source: awssm
+          awssm:
+            endpoint: <regional Secrets Manager endpoint>
+            stsEndpoint: <regional STS endpoint>
+            certSecret: <secret name or ARN>
+            # Leave empty when ONE secret carries both certificate and key.
+            # Both layouts are handled without a code change.
+            keySecret: ""
+            caSecret: ""
+
+        serviceAccount:
+          # Unset falls through to the node role; either credential model works
+          # with these same manifests.
+          roleArn: <role the workload may assume>
+
+        auth:
+          # The front sends the identity token in Authorization and the access
+          # token in x-auth-request-access-token.
+          mode: bearer-jwt
+          # Claim names are the common OIDC spellings and are NOT confirmed
+          # against the Sponsor's STS. /api/whoami reports the names a real
+          # token actually carries — names only, never values — so a mismatch
+          # is diagnosed in one request and corrected here.
+          claimId: sub
+          claimName: name
+          claimGroups: groups
+          claimOrg: org
+          # Empty means any authenticated caller.
+          requiredGroups: ""
+
+        modelGateway:
+          # Base URL INCLUDING the version path; the code appends
+          # /chat/completions. Both endpoint and key must be set or the pods
+          # answer from fixtures — which is a green deployment that quietly is
+          # not using the gateway. Each pod logs its mode at startup.
+          endpoint: <https://host/v1>
+          name: <model name>
+          # The key is a Secret, not a chart value. Create it out of band:
+          #   kubectl -n imax create secret generic imax-model-gateway \
+          #     --from-literal=MODEL_API_KEY=...
+          existingSecret: imax-model-gateway
+
+        ingress:
+          enabled: true
+          host: <hostname>
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: imax
+
+  syncPolicy:
+    # Deliberately NOT automated. This is a prototype under evaluation; an
+    # unattended sync during a demonstration is a failure mode with no upside.
+    # Turn on automated pruning and self-heal once it is past evaluation.
+    syncOptions:
+      - CreateNamespace=true
+      # The certificate initContainer waits on Secrets Manager, so the first
+      # sync can outrun the default readiness window.
+      - ApplyOutOfSyncOnly=true
+    retry:
+      limit: 3
+      backoff:
+        duration: 15s
+        factor: 2
+        maxDuration: 3m

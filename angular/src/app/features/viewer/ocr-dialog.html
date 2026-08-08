@@ -1,0 +1,354 @@
+<div
+  class="ocr-backdrop"
+  role="button"
+  tabindex="0"
+  aria-label="Close OCR viewer"
+  (click)="closed.emit()"
+  (keydown.escape)="closed.emit()"
+></div>
+<div
+  class="ocr-modal"
+  role="dialog"
+  data-testid="ocr-dialog"
+  aria-label="OCR Viewer"
+  [class.maximized]="maximized()"
+  [style.width.px]="maximized() ? null : widthPx()"
+  [style.height.px]="maximized() ? null : heightPx()"
+>
+  <div class="ocr-title">
+    <span class="title-text">OCR Viewer · {{ open().attachment.name }}</span>
+    <span class="zoom-group">
+      <button
+        class="action-btn"
+        type="button"
+        title="Fit the page width"
+        data-testid="ocr-zoom-width"
+        [class.on]="zoom() === 'width'"
+        (click)="setZoom('width')"
+      >
+        <mat-icon>fit_page</mat-icon>
+      </button>
+      <button
+        class="action-btn"
+        type="button"
+        title="Fit the whole page"
+        data-testid="ocr-zoom-fit"
+        [class.on]="zoom() === 'fit'"
+        (click)="setZoom('fit')"
+      >
+        <mat-icon>fit_screen</mat-icon>
+      </button>
+      <button
+        class="action-btn"
+        type="button"
+        title="Actual size"
+        data-testid="ocr-zoom-1"
+        [class.on]="zoom() === 1"
+        (click)="setZoom(1)"
+      >
+        <mat-icon>crop_original</mat-icon>
+      </button>
+      <button
+        class="action-btn"
+        type="button"
+        title="Zoom to 200%"
+        data-testid="ocr-zoom-2"
+        [class.on]="zoom() === 2"
+        (click)="setZoom(2)"
+      >
+        <mat-icon>zoom_in</mat-icon>
+      </button>
+    </span>
+    <button
+      class="action-btn"
+      type="button"
+      [title]="maximized() ? 'Restore' : 'Maximize'"
+      data-testid="ocr-maximize"
+      [attr.aria-pressed]="maximized()"
+      (click)="toggleMaximize()"
+    >
+      <mat-icon>{{ maximized() ? 'close_fullscreen' : 'open_in_full' }}</mat-icon>
+    </button>
+    <button class="action-btn" type="button" title="Close" (click)="closed.emit()">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <!-- Stacked, not side by side. The scans are portrait pages; a horizontal
+       split gave the image a landscape half-pane and shrank an A4 document to
+       thumbnail size, which is the thing the review complained about. Full
+       width for the scan, then the original text, then the English — the order
+       an officer reads them in. -->
+  <div class="ocr-body">
+    <div class="ocr-image-pane" [style.flex]="'0 0 ' + splitRatio() * 100 + '%'">
+      <div class="ocr-image">
+        <img [src]="imageUri()" [alt]="open().attachment.name" [ngStyle]="imageStyle()" />
+      </div>
+      @if (pageCount() > 1) {
+        <div class="pager">
+          <button
+            class="action-btn"
+            type="button"
+            title="Previous page"
+            data-testid="ocr-page-prev"
+            [disabled]="pageIndex() === 0"
+            (click)="turnPage(-1)"
+          >
+            <mat-icon>chevron_left</mat-icon>
+          </button>
+          <span class="pager-indicator" data-testid="ocr-page-indicator">
+            Page {{ pageIndex() + 1 }} / {{ pageCount() }}
+          </span>
+          <button
+            class="action-btn"
+            type="button"
+            title="Next page"
+            data-testid="ocr-page-next"
+            [disabled]="pageIndex() === pageCount() - 1"
+            (click)="turnPage(1)"
+          >
+            <mat-icon>chevron_right</mat-icon>
+          </button>
+        </div>
+      }
+    </div>
+
+    <div
+      class="split-handle"
+      role="separator"
+      aria-orientation="horizontal"
+      aria-label="Resize scan and text"
+      data-testid="ocr-split-handle"
+      (pointerdown)="startSplit($event)"
+    ></div>
+
+    <div class="ocr-text">
+      <section class="text-section">
+        <span class="caption">
+          EXTRACTED TEXT — ORIGINAL
+          @if (ocr(); as o) {
+            · {{ o.engine }}@if (o.srcLang) { · {{ o.srcLang.toUpperCase() }}} · schema {{ o.schemaVersion }}@if (pageCount() > 1) { · page {{ pageIndex() + 1 }} of {{ pageCount() }}}
+          } @else {
+            · running…
+          }
+        </span>
+        <!-- A configured gateway that failed is NOT the same as one that was
+             never wired, and the difference matters to whoever certifies this
+             text. The provenance label alone changes too quietly to notice. -->
+        @if (ocr()?.degraded; as d) {
+          <p class="degraded-banner" data-testid="ocr-degraded">
+            <mat-icon class="chip-icon">warning</mat-icon>
+            Showing stored text — the live service at {{ d.attempted }} did not answer after
+            {{ d.attempts }} attempt{{ d.attempts === 1 ? '' : 's' }} ({{ d.reason }}). This
+            is not a live transcription.
+          </p>
+        }
+        <!-- One block per line, numbered. An OCR block is a line of the
+             document; running them together loses which is which, and an
+             officer citing a document needs to be able to point at one.
+             Each line carries its own English beside it, so the eye travels
+             across one line rather than between two stacked blocks. The source
+             column is on the side the script starts from — left for Russian and
+             Chinese, right for Arabic and Farsi — so the original always reads
+             outward from the margin it would occupy on the page itself. -->
+        <ol
+          class="blocks"
+          data-testid="ocr-blocks"
+          [class.paired]="hasLineEnglish()"
+          [class.src-rtl]="isRtl()"
+        >
+          @for (b of visibleBlocks(); track $index) {
+            <li class="block-line" [attr.data-testid]="'ocr-line-' + $index">
+              <span class="block-src" [attr.dir]="isRtl() ? 'rtl' : 'ltr'">{{ b.text }}</span>
+              @if (hasLineEnglish()) {
+                <span class="block-en" dir="ltr" [attr.data-testid]="'ocr-line-en-' + $index">{{ b.en }}</span>
+              }
+            </li>
+          }
+        </ol>
+      </section>
+
+      @if (ocr()?.englishGloss) {
+        <!-- The document's English gets the same three moves a message
+             translation gets: confirm it, correct it, or send it back for a
+             better one. Certifying a document translation is the same kind of
+             assertion as certifying a message. -->
+        <section class="text-section gloss" [class.reviewed]="!!docReview()">
+          <div class="gloss-header">
+            <span class="caption">ENGLISH · {{ glossBadge() }}</span>
+            <span class="spacer"></span>
+            @if (!glossEditing()) {
+              <button
+                class="action-btn"
+                type="button"
+                [title]="docReview() ? 'Clear this verdict' : 'Confirm this translation'"
+                [attr.aria-pressed]="!!docReview()"
+                [class.confirmed]="docReview()?.verdict === 'confirmed'"
+                data-testid="ocr-gloss-confirm"
+                (click)="confirmGloss()"
+              >
+                <mat-icon>check</mat-icon>
+              </button>
+              <button
+                class="action-btn"
+                type="button"
+                title="Correct this translation"
+                [class.edited]="docReview()?.verdict === 'edited'"
+                data-testid="ocr-gloss-edit"
+                (click)="startGlossEdit()"
+              >
+                <mat-icon>edit_note</mat-icon>
+              </button>
+              <button
+                class="action-btn"
+                type="button"
+                title="Re-run through the model gateway"
+                data-testid="ocr-gloss-retranslate"
+                [disabled]="retranslating()"
+                (click)="retranslate()"
+              >
+                @if (retranslating()) {
+                  <mat-spinner class="inline-spinner" diameter="14" strokeWidth="2" />
+                } @else {
+                  <mat-icon>auto_awesome</mat-icon>
+                }
+              </button>
+            }
+          </div>
+
+          @if (glossEditing()) {
+            <!-- The correction is written with the original still on screen
+                 above it: no verdict without the source. -->
+            <textarea
+              class="edit-area"
+              rows="6"
+              data-testid="ocr-gloss-field"
+              [value]="glossDraft()"
+              (input)="glossDraft.set($any($event.target).value)"
+            ></textarea>
+            <div class="edit-actions">
+              <button class="solid-btn" type="button" data-testid="ocr-gloss-save" (click)="saveGlossEdit()">
+                Save translation
+              </button>
+              <button class="text-btn" type="button" (click)="glossEditing.set(false)">Cancel</button>
+            </div>
+          } @else {
+            <p class="gloss-text" data-testid="ocr-gloss">{{ glossText() }}</p>
+          }
+        </section>
+      }
+    </div>
+  </div>
+
+  <div class="doc-annotation" data-testid="doc-annotation">
+    <span class="caption strong">OFFICER ANNOTATION</span>
+
+    <div class="tag-row">
+      <mat-icon class="tag-icon">sell</mat-icon>
+      @for (tag of quickTags; track tag) {
+        <button
+          class="chip chip-secondary"
+          type="button"
+          [class.on]="tags().includes(tag)"
+          [attr.data-testid]="'doctag-' + tag"
+          (click)="toggleTag(tag)"
+        >
+          {{ tag }}
+        </button>
+      }
+      <!-- Session vocabulary: every custom tag coined on any document, so one
+           invented here can be applied to the next scan. Lit when it is on
+           this document; click toggles. -->
+      @for (tag of customTags(); track tag) {
+        <button
+          class="chip chip-secondary"
+          type="button"
+          [class.on]="tags().includes(tag)"
+          [attr.data-testid]="'doctag-' + tag"
+          [title]="tags().includes(tag) ? 'Remove from this document' : 'Apply to this document'"
+          (click)="toggleTag(tag)"
+        >
+          {{ tag }}
+        </button>
+      }
+      <span class="tag-entry">
+        <input
+          class="tag-input"
+          type="text"
+          placeholder="new tag"
+          aria-label="Add a new tag"
+          data-testid="doctag-input"
+          [value]="tagInput()"
+          (input)="tagInput.set($any($event.target).value)"
+          (keydown.enter)="addCustomTag($event)"
+          (blur)="addCustomTag()"
+        />
+        <button
+          class="chip chip-add"
+          type="button"
+          title="Add tag"
+          data-testid="doctag-add"
+          [disabled]="!tagInput().trim()"
+          (click)="addCustomTag($event)"
+        >
+          <mat-icon class="add-icon">add</mat-icon>
+          Add
+        </button>
+      </span>
+    </div>
+
+    @if (noteEditing()) {
+      <div class="edit-block">
+        <textarea
+          class="edit-area"
+          rows="2"
+          placeholder="Officer interpretation — what this document is, who it implicates, what it corroborates…"
+          data-testid="doc-note-field"
+          [value]="noteDraft()"
+          (input)="noteDraft.set($any($event.target).value)"
+        ></textarea>
+        <div class="edit-actions">
+          <button class="solid-btn" type="button" data-testid="doc-note-save" (click)="saveNote()">
+            Save note
+          </button>
+          <button class="text-btn" type="button" (click)="noteEditing.set(false)">Cancel</button>
+          @if (note()) {
+            <button class="text-btn danger" type="button" (click)="deleteNote()">Delete</button>
+          }
+        </div>
+      </div>
+    } @else if (note(); as n) {
+      <div class="note-display" data-testid="doc-note-display">
+        <div class="note-header">
+          <mat-icon class="note-icon">comment</mat-icon>
+          <span class="note-label">NOTE</span>
+          <button
+            class="action-btn"
+            type="button"
+            title="Edit note"
+            data-testid="doc-note-edit"
+            (click)="startNote(n)"
+          >
+            <mat-icon>edit_note</mat-icon>
+          </button>
+        </div>
+        <p class="note-text">{{ n }}</p>
+      </div>
+    } @else {
+      <button class="text-btn add-note" type="button" data-testid="doc-note-add" (click)="startNote('')">
+        <mat-icon class="note-icon">comment</mat-icon>
+        Add note
+      </button>
+    }
+  </div>
+
+  @if (!maximized()) {
+    <div
+      class="resize-grip"
+      role="separator"
+      aria-label="Resize viewer"
+      data-testid="ocr-resize"
+      (pointerdown)="startResize($event)"
+    ></div>
+  }
+</div>

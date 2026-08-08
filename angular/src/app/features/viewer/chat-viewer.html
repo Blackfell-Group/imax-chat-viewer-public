@@ -1,0 +1,221 @@
+@if (triage.selectedThread(); as thread) {
+  <div class="viewer" data-testid="chat-viewer">
+    <header class="viewer-header">
+      <div class="thread-id">
+        <span class="thread-title">{{ thread.title }}</span>
+        <span class="thread-meta">
+          {{ thread.network }} · {{ thread.messageCount }} messages ·
+          {{ thread.languages.join(', ') }}
+        </span>
+      </div>
+      <button class="text-btn header-btn" type="button" data-testid="summarize-btn" (click)="summarize()">
+        <mat-icon class="chip-icon">summarize</mat-icon>
+        {{ showSummary() ? 'Hide summary' : 'Summarize thread' }}
+      </button>
+    </header>
+
+    <!-- [31 Jul amendment] The thread workflow strip: gold-ready meter and
+         ALL thread-level decisions in one place — promote, flag, discard.
+         The queue itself only marks work done (1 Aug: a linguist doesn't
+         discard from the stack). -->
+    <div class="gold-strip">
+      @if (foreignMsgs().length > 0) {
+        <span class="gold-meter" [class.ready]="goldReady()" data-testid="thread-gold-ready">
+          translated {{ translatedCount() }}/{{ foreignMsgs().length }} · reviewed
+          {{ reviewedCount() }}/{{ foreignMsgs().length }}
+          @if (goldReady()) {
+            · GOLD-READY
+          }
+        </span>
+      }
+      <span class="spacer"></span>
+      <button
+        class="text-btn header-btn"
+        type="button"
+        title="Flag for targeter"
+        [class.strip-flagged]="triage.dispo()[thread.threadId] === 'flagged'"
+        [attr.data-testid]="'dispo-flagged-' + thread.threadId"
+        (click)="triage.mark(thread.threadId, 'flagged')"
+      >
+        <mat-icon class="chip-icon">flag</mat-icon>
+        {{ triage.dispo()[thread.threadId] === 'flagged' ? 'Flagged' : 'Flag for targeter' }}
+      </button>
+      <button
+        class="text-btn header-btn"
+        type="button"
+        title="Discard thread"
+        [class.strip-discarded]="triage.dispo()[thread.threadId] === 'discarded'"
+        [attr.data-testid]="'dispo-discarded-' + thread.threadId"
+        (click)="triage.mark(thread.threadId, 'discarded')"
+      >
+        <mat-icon class="chip-icon">remove_circle_outline</mat-icon>
+        {{ triage.dispo()[thread.threadId] === 'discarded' ? 'Discarded' : 'Discard' }}
+      </button>
+      @if (pendingEntities() > 0 || extracting()) {
+        <button
+          class="text-btn header-btn"
+          type="button"
+          title="Extract entities across the whole thread (one time)"
+          data-testid="thread-extract-entities"
+          [disabled]="extracting()"
+          (click)="extractThreadEntities()"
+        >
+          @if (extracting()) {
+            <mat-spinner class="inline-spinner" diameter="14" strokeWidth="2" />
+          } @else {
+            <mat-icon class="chip-icon">label</mat-icon>
+          }
+          {{ extracting() ? 'Extracting…' : 'Extract entities' }}
+        </button>
+      }
+      @if (foreignMsgs().length > 0) {
+        <!-- Only shown when something is actually untranslated: threads
+             arrive translated, so this is the retry path, not the norm. -->
+        @if (pendingTranslation() > 0 || translating()) {
+          <button
+            class="text-btn header-btn"
+            type="button"
+            title="Translate the messages still missing a translation"
+            data-testid="thread-translate-all"
+            [disabled]="translating()"
+            (click)="translateThread()"
+          >
+            @if (translating()) {
+              <mat-spinner class="inline-spinner" diameter="14" strokeWidth="2" />
+            } @else {
+              <mat-icon class="chip-icon">translate</mat-icon>
+            }
+            {{ translating() ? 'Translating…' : 'Translate ' + pendingTranslation() + ' remaining' }}
+          </button>
+        }
+        <!-- Only offered when there is a tail worth clearing. On an 18-message
+             thread reading each one IS the workflow, and a shortcut there would
+             just be a way to skip it. -->
+        @if (unreviewed().length > 3) {
+          <button
+            class="text-btn header-btn"
+            type="button"
+            data-testid="bulk-confirm"
+            (click)="bulkConfirm()"
+          >
+            <mat-icon class="chip-icon">done_all</mat-icon>
+            Accept remaining {{ unreviewed().length }}
+          </button>
+        }
+        <button
+          class="text-btn header-btn promote"
+          type="button"
+          data-testid="promote-thread-gold"
+          [disabled]="!goldReady() || alreadyGold()"
+          (click)="promoteThreadGold()"
+        >
+          <mat-icon class="chip-icon">workspace_premium</mat-icon>
+          {{ alreadyGold() ? 'In gold copy' : 'Promote to gold' }}
+        </button>
+        <button
+          class="text-btn header-btn"
+          type="button"
+          data-testid="thread-note-toggle"
+          [class.has-note]="threadNote()"
+          [attr.aria-pressed]="threadNoteEditing()"
+          [title]="threadNote() ? 'Edit conversation note' : 'Add a note on the whole conversation'"
+          (click)="toggleThreadNote()"
+        >
+          <mat-icon class="chip-icon">rate_review</mat-icon>
+          {{ threadNote() ? 'Conversation note' : 'Add conversation note' }}
+        </button>
+      }
+    </div>
+
+    <!-- A judgement about the exchange as a whole — register, authenticity, the
+         relationship between speakers — rather than an annotation on any one
+         message. It sits above the stream because that is where it is true. -->
+    @if (threadNoteEditing()) {
+      <div class="thread-note-editor" data-testid="thread-note-editor">
+        <label class="control-label" for="thread-note-field">
+          Conversation note — your assessment of the exchange as a whole
+        </label>
+        <textarea
+          id="thread-note-field"
+          class="thread-note-field"
+          rows="3"
+          data-testid="thread-note-field"
+          placeholder="e.g. Speaker does not read as a native Russian speaker — calques and stock phrasing throughout. The two appear to know each other well."
+          [value]="threadNoteDraft()"
+          (input)="threadNoteDraft.set($any($event.target).value)"
+        ></textarea>
+        <div class="thread-note-actions">
+          <button class="text-btn" type="button" data-testid="thread-note-save" (click)="saveThreadNote()">
+            Save note
+          </button>
+          <button class="text-btn" type="button" data-testid="thread-note-cancel" (click)="threadNoteEditing.set(false)">
+            Cancel
+          </button>
+        </div>
+      </div>
+    } @else if (threadNote(); as tn) {
+      <aside class="thread-note" data-testid="thread-note">
+        <span class="thread-note-label">CONVERSATION NOTE · {{ identity.label() }}</span>
+        <p class="thread-note-text">{{ tn }}</p>
+      </aside>
+    }
+
+    @if (showSummary() && summary(); as s) {
+      <aside class="summary-widget" data-testid="summary-widget">
+        <div class="summary-header">
+          <span class="summary-title">EXECUTIVE SUMMARY · {{ s.service }}</span>
+          <button class="icon-btn small" type="button" title="Close" (click)="showSummary.set(false)">
+            <mat-icon>close</mat-icon>
+          </button>
+        </div>
+        <p class="summary-text">{{ s.summary }}</p>
+      </aside>
+    }
+
+    <div class="stream-bar">
+      <span class="stream-count" data-testid="stream-count">
+        {{ orderedMessages().length }} message{{ orderedMessages().length === 1 ? '' : 's' }}
+      </span>
+      <button
+        class="text-btn header-btn"
+        type="button"
+        [title]="sortDir() === 'asc' ? 'Sorted oldest first — switch to newest first' : 'Sorted newest first — switch to oldest first'"
+        data-testid="stream-sort"
+        (click)="toggleSort()"
+      >
+        <mat-icon class="chip-icon">{{ sortDir() === 'asc' ? 'arrow_downward' : 'arrow_upward' }}</mat-icon>
+        {{ sortDir() === 'asc' ? 'Oldest first' : 'Newest first' }}
+      </button>
+    </div>
+
+    <!-- Windowed rendering (TDD 3.3), fixed-size strategy from
+         @angular/cdk/scrolling. The autosize strategy lives in
+         @angular/cdk-experimental, and adding an experimental package that the
+         enclave npm mirror has to carry and trivy has to clear is a bad trade
+         for a deliverable the Government maintains. Bubble heights vary, so
+         the scrollbar is approximate — what gets rendered is not. Buffers are
+         deliberately generous so ordinary reading never outruns the window. -->
+    <cdk-virtual-scroll-viewport
+      class="stream"
+      [itemSize]="itemSizePx()"
+      (scrolledIndexChange)="onScrolled()"
+      [minBufferPx]="900"
+      [maxBufferPx]="1800"
+      data-testid="message-stream"
+    >
+      <app-message-bubble
+        *cdkVirtualFor="let m of orderedMessages(); trackBy: trackMessage"
+        [msg]="m"
+        [thread]="thread"
+        [highlighted]="flashId() === m.messageId"
+        (openAttachment)="attachment.set($event)"
+      />
+    </cdk-virtual-scroll-viewport>
+
+    @if (attachment(); as a) {
+      <app-ocr-dialog [open]="a" (closed)="attachment.set(null)" />
+    }
+  </div>
+} @else {
+  <div class="empty-state">Select a thread from the queue to begin triage.</div>
+}

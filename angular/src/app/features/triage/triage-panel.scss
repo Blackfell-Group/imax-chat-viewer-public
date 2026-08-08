@@ -1,0 +1,452 @@
+@use '../panel' as *;
+
+.rail-left {
+  border-right: 1px solid var(--line);
+}
+
+// Find-tools toggle: lit while the discovery tools are showing.
+.icon-btn.on {
+  color: var(--primary);
+}
+
+.panel-body {
+  position: relative;   // anchors .panel-resize-handle
+  width: 312px;
+  flex-shrink: 0;
+  border-right: 1px solid var(--line);
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.controls {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 0 12px 8px;
+}
+
+.control-group .control-label {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--text-dim);
+  font-size: 10px;
+}
+
+.chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  height: 20px;
+  padding: 0 8px;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--text);
+  font-size: 10px;
+  font-weight: 600;
+  cursor: pointer;
+
+  .chip-icon {
+    font-size: 12px;
+    width: 12px;
+    height: 12px;
+  }
+
+  &.chip-primary {
+    border: 1px solid var(--primary);
+
+    &.on {
+      background: var(--primary);
+      color: #10151b;
+    }
+  }
+
+  &.chip-secondary {
+    height: 22px;
+    border: 1px solid var(--secondary);
+
+    &.on {
+      background: var(--secondary);
+      color: #10151b;
+    }
+  }
+}
+
+// Compact: a three-item menu doesn't earn a full form field.
+.sort-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+
+  .control-label {
+    margin-bottom: 0;
+  }
+}
+
+.sort-select {
+  flex: 1;
+  min-width: 0;
+  height: 22px;
+  padding: 0 4px;
+  border: 1px solid #3a4656;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--text);
+  font-family: inherit;
+  font-size: 11px;
+
+  &:focus {
+    outline: none;
+    border-color: var(--primary);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+  }
+
+  option {
+    background: var(--paper);
+    color: var(--text);
+  }
+}
+
+.search-input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 8px 10px;
+  border: 1px solid #3a4656;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--text);
+  font-size: 13px;
+  font-family: inherit;
+
+  &:focus {
+    outline: none;
+    border-color: var(--primary);
+  }
+
+  &::placeholder {
+    color: var(--text-dim);
+  }
+}
+
+.mode-toggle {
+  width: 100%;
+  border-color: #3a4656;
+
+  ::ng-deep .mat-button-toggle {
+    flex: 1;
+    font-size: 11px;
+  }
+}
+
+.chip-facet {
+  border: 1px solid var(--chip-color);
+
+  &.on {
+    background: var(--chip-color);
+    color: #10151b;
+  }
+}
+
+.filters-btn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  justify-content: flex-start;
+  color: var(--text-dim);
+  font-size: 11px;
+  text-transform: uppercase;
+}
+
+.date-row {
+  display: flex;
+  gap: 8px;
+}
+
+.date-field {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 10px;
+  color: var(--text-dim);
+
+  input {
+    padding: 5px 8px;
+    border: 1px solid #3a4656;
+    border-radius: 4px;
+    background: transparent;
+    color: var(--text);
+    font-family: inherit;
+    font-size: 12px;
+    color-scheme: dark;
+  }
+}
+
+.hit-row {
+  padding: 6px 12px;
+  border-bottom: 1px solid #1c242e;
+  cursor: pointer;
+
+  &:hover {
+    background: rgb(255 255 255 / 4%);
+  }
+
+  .hit-title {
+    flex: 1;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .hit-date {
+    color: var(--text-dim);
+    font-size: 10px;
+  }
+}
+
+.entity-chip {
+  display: inline-block;
+  height: 18px;
+  margin: 2px 0 4px;
+  padding: 0 6px;
+  border-radius: 9px;
+  background: var(--chip-color);
+  color: #10151b;
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 18px;
+}
+
+.hit-meta-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 4px;
+
+  .translation-badge {
+    background: #28405e;
+    border: none;
+  }
+
+  .hit-sender {
+    color: var(--text-dim);
+    font-size: 10px;
+  }
+}
+
+.queue-header {
+  display: flex;
+  align-items: center;
+  padding: 0 12px 2px;
+
+  .queue-stats {
+    flex: 1;
+    color: var(--text-dim);
+    font-size: 11px;
+  }
+}
+
+.text-btn {
+  border: none;
+  background: transparent;
+  color: var(--primary);
+  font-size: 10px;
+  text-transform: uppercase;
+  cursor: pointer;
+  padding: 2px 4px;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+// [31 Jul amendment] The finite stack made visible: N-of-M worked.
+.queue-progress {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 12px 6px;
+  color: var(--text-dim);
+  font-size: 10px;
+
+  .queue-progress-bar {
+    flex: 1;
+    height: 4px;
+    border-radius: 2px;
+    background: #1c242e;
+    overflow: hidden;
+  }
+
+  .queue-progress-fill {
+    height: 100%;
+    background: var(--entity-geo);
+    transition: width 0.2s;
+  }
+}
+
+.thread-list {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.stack-clear {
+  margin: 0;
+  padding: 8px 12px;
+  color: var(--text-dim);
+  font-size: 11px;
+}
+
+.thread-row {
+  padding: 6px 12px;
+  border-bottom: 1px solid #1c242e;
+  cursor: pointer;
+
+  &:hover {
+    background: rgb(255 255 255 / 4%);
+  }
+
+  &.selected {
+    background: rgb(77 163 255 / 12%);
+  }
+
+  &.discarded {
+    opacity: 0.45;
+
+    .thread-title {
+      text-decoration: line-through;
+    }
+  }
+}
+
+.thread-title-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+
+  .type-icon {
+    font-size: 13px;
+    width: 13px;
+    height: 13px;
+    color: var(--text-dim);
+    flex-shrink: 0;
+  }
+
+  .thread-title {
+    flex: 1;
+    font-size: 13px;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .hasdoc-icon {
+    font-size: 13px;
+    width: 13px;
+    height: 13px;
+    color: var(--secondary);
+    transform: rotate(45deg);
+    flex-shrink: 0;
+  }
+}
+
+.dispo-badge {
+  height: 15px;
+  padding: 0 5px;
+  border-radius: 8px;
+  font-size: 8px;
+  font-weight: 600;
+  line-height: 15px;
+  color: #10151b;
+  flex-shrink: 0;
+
+  &.badge-reviewed {
+    background: var(--entity-geo);
+  }
+
+  &.badge-flagged {
+    background: var(--entity-passport);
+  }
+}
+
+.thread-meta-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 3px;
+
+  .meta-chip {
+    height: 16px;
+    padding: 0 6px;
+    border-radius: 8px;
+    background: #2b3646;
+    font-size: 9px;
+    line-height: 16px;
+
+    &.outlined {
+      background: transparent;
+      border: 1px solid #3a4656;
+    }
+  }
+
+  .msg-count {
+    color: var(--text-dim);
+    font-size: 10px;
+  }
+
+  .spacer {
+    flex: 1;
+  }
+}
+
+.dispo-btn {
+  border: none;
+  background: transparent;
+  padding: 2px;
+  cursor: pointer;
+  color: var(--text-dim);
+  line-height: 0;
+
+  mat-icon {
+    font-size: 15px;
+    width: 15px;
+    height: 15px;
+  }
+
+  &.active-reviewed {
+    color: var(--entity-geo);
+  }
+
+  &.active-flagged {
+    color: var(--entity-passport);
+  }
+
+  &.active-discarded {
+    color: #f44336;
+  }
+}
+
+// Resize strip on the edge this panel faces the workspace across.
+.panel-resize-handle {
+  right: 0;
+}
+
+// Flagged handoff chip: carries the same colour as the viewer strip's flag
+// action, so the mark an officer made and the filter that finds it read as
+// the same thing.
+.flagged-chip.on {
+  --chip-color: var(--flag, #d08a3a);
+}

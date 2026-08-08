@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="1132" viewBox="0 0 400 566">
+  <rect width="400" height="566" fill="#f6f2e7"/>
+  <rect x="14" y="14" width="372" height="538" fill="none" stroke="#8a7f66" stroke-width="2"/>
+  <text x="360" y="46" text-anchor="start" direction="rtl" font-family="'Noto Naskh Arabic','Noto Sans Arabic','Geeza Pro','Amiri','Scheherazade New',serif" font-size="11" font-weight="normal" fill="#8a7f66">الهيئة العامة للجمارك</text>
+  <text x="360" y="62" text-anchor="start" direction="rtl" font-family="'Noto Naskh Arabic','Noto Sans Arabic','Geeza Pro','Amiri','Scheherazade New',serif" font-size="10" font-weight="normal" fill="#8a7f66">ميناء مصراتة — قسم الوارد</text>
+  <line x1="40" y1="72" x2="360" y2="72" stroke="#8a7f66" stroke-width="1"/>
+  <text x="360" y="98" text-anchor="start" direction="rtl" font-family="'Noto Naskh Arabic','Noto Sans Arabic','Geeza Pro','Amiri','Scheherazade New',serif" font-size="17" font-weight="bold" fill="#3a3428">بيان تفصيلي بالبضاعة</text>
+  <text x="360" y="118" text-anchor="start" direction="rtl" font-family="'Noto Naskh Arabic','Noto Sans Arabic','Geeza Pro','Amiri','Scheherazade New',serif" font-size="12" font-weight="normal" fill="#6b6250">الطرود ١ – ٨</text>
+  <rect x="40" y="147" width="320" height="19" fill="#e6dfcd"/>
+  <text x="348" y="160" text-anchor="end" direction="ltr" font-family="'Courier New',Courier,monospace" font-size="10" fill="#3a3428">#</text>
+  <text x="318" y="160" text-anchor="start" direction="rtl" font-family="'Noto Naskh Arabic','Noto Sans Arabic','Geeza Pro','Amiri','Scheherazade New',serif" font-size="10.5" font-weight="bold" fill="#3a3428">وصف البضاعة</text>
+  <text x="140" y="160" text-anchor="start" direction="rtl" font-family="'Noto Naskh Arabic','Noto Sans Arabic','Geeza Pro','Amiri','Scheherazade New',serif" font-size="10.5" font-weight="bold" fill="#3a3428">الكمية</text>
+  <text x="80" y="160" text-anchor="start" direction="rtl" font-family="'Noto Naskh Arabic','Noto Sans Arabic','Geeza Pro','Amiri','Scheherazade New',serif" font-size="10.5" font-weight="bold" fill="#3a3428">الوزن</text>
+  <text x="348" y="184" text-anchor="end" direction="ltr" font-family="'Courier New',Courier,monospace" font-size="10.5" fill="#3a3428">1</text>
+  <text x="318" y="184" text-anchor="start" direction="rtl" font-family="'Noto Naskh Arabic','Noto Sans Arabic','Geeza Pro','Amiri','Scheherazade New',serif" font-size="11" font-weight="normal" fill="#3a3428">محركات ديزل — قطع غيار</text>
+  <text x="122" y="184" text-anchor="middle" direction="ltr" font-family="'Courier New',Courier,monospace" font-size="10.5" fill="#3a3428">٦</text>
+  <text x="64" y="184" text-anchor="middle" direction="ltr" font-family="'Courier New',Courier,monospace" font-size="10.5" fill="#3a3428">٩٤٠</text>
+  <line x1="40" y1="191" x2="360" y2="191" stroke="#8a7f66" stroke-width="0.6" opacity="0.6"/>
+  <text x="348" y="210" text-anchor="end" direction="ltr" font-family="'Courier New',Courier,monospace" font-size="10.5" fill="#3a3428">2</text>
+  <text x="318" y="210" text-anchor="start" direction="rtl" font-family="'Noto Naskh Arabic','Noto Sans Arabic','Geeza Pro','Amiri','Scheherazade New',serif" font-size="11" font-weight="normal" fill="#3a3428">مضخات هيدروليكية</text>
+  <text x="122" y="210" text-anchor="middle" direction="ltr" font-family="'Courier New',Courier,monospace" font-size="10.5" fill="#3a3428">٤</text>
+  <text x="64" y="210" text-anchor="middle" direction="ltr" font-family="'Courier New',Courier,monospace" font-size="10.5" fill="#3a3428">٣١٠</text>
+  <line x1="40" y1="217" x2="360" y2="217" stroke="#8a7f66" stroke-width="0.6" opacity="0.6"/>
+  <text x="348" y="236" text-anchor="end" direction="ltr" font-family="'Courier New',Courier,monospace" font-size="10.5" fill="#3a3428">3</text>
+  <text x="318" y="236" text-anchor="start" direction="rtl" font-family="'Noto Naskh Arabic','Noto Sans Arabic','Geeza Pro','Amiri','Scheherazade New',serif" font-size="11" font-weight="normal" fill="#3a3428">صمامات ضغط عالٍ</text>
+  <text x="122" y="236" text-anchor="middle" direction="ltr" font-family="'Courier New',Courier,monospace" font-size="10.5" fill="#3a3428">١٢</text>
+  <text x="64" y="236" text-anchor="middle" direction="ltr" font-family="'Courier New',Courier,monospace" font-size="10.5" fill="#3a3428">١٨٥</text>
+  <line x1="40" y1="243" x2="360" y2="243" stroke="#8a7f66" stroke-width="0.6" opacity="0.6"/>
+  <text x="348" y="262" text-anchor="end" direction="ltr" font-family="'Courier New',Courier,monospace" font-size="10.5" fill="#3a3428">4</text>
+  <text x="318" y="262" text-anchor="start" direction="rtl" font-family="'Noto Naskh Arabic','Noto Sans Arabic','Geeza Pro','Amiri','Scheherazade New',serif" font-size="11" font-weight="normal" fill="#3a3428">أطقم حشوات ومانعات تسرب</text>
+  <text x="122" y="262" text-anchor="middle" direction="ltr" font-family="'Courier New',Courier,monospace" font-size="10.5" fill="#3a3428">٨</text>
+  <text x="64" y="262" text-anchor="middle" direction="ltr" font-family="'Courier New',Courier,monospace" font-size="10.5" fill="#3a3428">٦٢</text>
+  <line x1="40" y1="269" x2="360" y2="269" stroke="#8a7f66" stroke-width="0.6" opacity="0.6"/>
+  <text x="348" y="288" text-anchor="end" direction="ltr" font-family="'Courier New',Courier,monospace" font-size="10.5" fill="#3a3428">5</text>
+  <text x="318" y="288" text-anchor="start" direction="rtl" font-family="'Noto Naskh Arabic','Noto Sans Arabic','Geeza Pro','Amiri','Scheherazade New',serif" font-size="11" font-weight="normal" fill="#3a3428">مرشحات زيت ووقود</text>
+  <text x="122" y="288" text-anchor="middle" direction="ltr" font-family="'Courier New',Courier,monospace" font-size="10.5" fill="#3a3428">١٤</text>
+  <text x="64" y="288" text-anchor="middle" direction="ltr" font-family="'Courier New',Courier,monospace" font-size="10.5" fill="#3a3428">١٤٨</text>
+  <line x1="40" y1="295" x2="360" y2="295" stroke="#8a7f66" stroke-width="0.6" opacity="0.6"/>
+  <text x="348" y="314" text-anchor="end" direction="ltr" font-family="'Courier New',Courier,monospace" font-size="10.5" fill="#3a3428">6</text>
+  <text x="318" y="314" text-anchor="start" direction="rtl" font-family="'Noto Naskh Arabic','Noto Sans Arabic','Geeza Pro','Amiri','Scheherazade New',serif" font-size="11" font-weight="normal" fill="#3a3428">أحزمة نقل الحركة</text>
+  <text x="122" y="314" text-anchor="middle" direction="ltr" font-family="'Courier New',Courier,monospace" font-size="10.5" fill="#3a3428">٩</text>
+  <text x="64" y="314" text-anchor="middle" direction="ltr" font-family="'Courier New',Courier,monospace" font-size="10.5" fill="#3a3428">٧٦</text>
+  <line x1="40" y1="321" x2="360" y2="321" stroke="#8a7f66" stroke-width="0.6" opacity="0.6"/>
+  <text x="348" y="340" text-anchor="end" direction="ltr" font-family="'Courier New',Courier,monospace" font-size="10.5" fill="#3a3428">7</text>
+  <text x="318" y="340" text-anchor="start" direction="rtl" font-family="'Noto Naskh Arabic','Noto Sans Arabic','Geeza Pro','Amiri','Scheherazade New',serif" font-size="11" font-weight="normal" fill="#3a3428">مساند محاور</text>
+  <text x="122" y="340" text-anchor="middle" direction="ltr" font-family="'Courier New',Courier,monospace" font-size="10.5" fill="#3a3428">٥</text>
+  <text x="64" y="340" text-anchor="middle" direction="ltr" font-family="'Courier New',Courier,monospace" font-size="10.5" fill="#3a3428">٢٤٠</text>
+  <line x1="40" y1="347" x2="360" y2="347" stroke="#8a7f66" stroke-width="0.6" opacity="0.6"/>
+  <text x="348" y="366" text-anchor="end" direction="ltr" font-family="'Courier New',Courier,monospace" font-size="10.5" fill="#3a3428">8</text>
+  <text x="318" y="366" text-anchor="start" direction="rtl" font-family="'Noto Naskh Arabic','Noto Sans Arabic','Geeza Pro','Amiri','Scheherazade New',serif" font-size="11" font-weight="normal" fill="#3a3428">كابلات كهربائية معزولة</text>
+  <text x="122" y="366" text-anchor="middle" direction="ltr" font-family="'Courier New',Courier,monospace" font-size="10.5" fill="#3a3428">٣</text>
+  <text x="64" y="366" text-anchor="middle" direction="ltr" font-family="'Courier New',Courier,monospace" font-size="10.5" fill="#3a3428">٤١٠</text>
+  <line x1="40" y1="373" x2="360" y2="373" stroke="#8a7f66" stroke-width="0.6" opacity="0.6"/>
+  <text x="360" y="414" text-anchor="start" direction="rtl" font-family="'Noto Naskh Arabic','Noto Sans Arabic','Geeza Pro','Amiri','Scheherazade New',serif" font-size="11" font-weight="normal" fill="#6b6250">يتبع في الصفحة التالية</text>
+  <line x1="40" y1="520" x2="360" y2="520" stroke="#8a7f66" stroke-width="1"/>
+  <text x="360" y="536" text-anchor="start" direction="rtl" font-family="'Noto Naskh Arabic','Noto Sans Arabic','Geeza Pro','Amiri','Scheherazade New',serif" font-size="9" font-weight="normal" fill="#8a7f66">إقرار جمركي رقم JM-2026-0703-0418</text>
+  <text x="70" y="536" text-anchor="middle" direction="ltr" font-family="'Courier New',Courier,monospace" font-size="9" fill="#8a7f66">2 / 5</text>
+  </svg>

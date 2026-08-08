@@ -1,0 +1,77 @@
+# Live model gateway configuration — the one thing to set when deploying to
+# the target enclave. The enrichment pods read these at runtime; unset, they
+# answer from their fixtures. No code change, no image rebuild.
+#
+# FOUR values switch it on: the endpoint, the key, and a model id for each of
+# the two jobs. The enclave supplies all four in the Secret:
+#
+#   kubectl create secret generic imax-model-gateway \
+#     --from-literal=MODEL_ENDPOINT='<gateway base URL, e.g. https://host/v1>' \
+#     --from-literal=MODEL_API_KEY='<key>' \
+#     --from-literal=MODEL_NAME='<model for translation, entities, summaries>' \
+#     --from-literal=MODEL_NAME_OCR='<model that can read an image>'
+#   kubectl rollout restart deploy -l part-of=imax-chat-viewer
+#
+# THE SECRET WINS. Every pod loads this ConfigMap and then the Secret, and
+# Kubernetes applies envFrom sources in order — a key in both takes the Secret's
+# value. So the enclave can carry all four in the Secret without editing
+# anything here, and this ConfigMap is the fallback rather than the source.
+#
+# TWO MODEL IDS, because the two jobs are not the same call. OCR sends the page
+# as an image; translation does not. A text-only model pointed at OCR refuses
+# every page, every document falls back to stored text, and the deployment looks
+# healthy — so each pod sends one test image at startup and says in its log if
+# the OCR model refused it. Translation is also the high-volume path, which is
+# the other reason to separate them.
+#
+# The committed values stay empty, so no gateway address enters this repository
+# — scripts/preflight-airgap.sh fails the build if one ever does.
+#
+# MODEL_ENDPOINT must be the base URL INCLUDING the version path
+# (https://host/v1). providers/model-gateway.js appends /chat/completions, so
+# an endpoint that already carries the suffix 404s in a way that reads like a
+# gateway outage.
+#
+# Provenance follows the configuration: a translation produced by the gateway
+# is labelled `<gateway-host>:<model>` in the gold copy, so an officer can
+# always see which engine answered. A malformed endpoint therefore corrupts
+# the gold copy's audit trail, not just the request.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: imax-model-gateway
+  labels:
+    part-of: imax-chat-viewer
+data:
+  # Empty ⇒ fixtures. Never commit a live enclave address here.
+  MODEL_ENDPOINT: ""
+  # Deliberately not a real model name. The Sponsor's gateway publishes its own
+  # inventory and will not have heard of a commercial one, so an unset
+  # deployment should fail with "no such model" rather than quietly asking for
+  # something that happens to exist somewhere else.
+  MODEL_NAME: "SET-ME"
+  # The model scans go to. Unset, each pod probes the gateway's published models
+  # with one test image at startup and uses the first that accepts it, logging
+  # the choice. Set it to pin the choice — provenance in the gold copy names
+  # whichever model actually read the document.
+  MODEL_NAME_OCR: ""
+  MODEL_TIMEOUT_MS: "20000"
+---
+# Placeholder so `kubectl apply -k` succeeds before the real Secret exists.
+# Replace with the command above (or a sealed/external secret) at deploy
+# time — never commit a live key.
+apiVersion: v1
+kind: Secret
+metadata:
+  name: imax-model-gateway
+  labels:
+    part-of: imax-chat-viewer
+type: Opaque
+stringData:
+  MODEL_API_KEY: ""
+  # The enclave Secret carries these three as well; set here they override the
+  # ConfigMap above. Left empty so `kubectl apply -k` works before the real
+  # Secret exists, and so nothing enclave-specific is committed.
+  MODEL_ENDPOINT: ""
+  MODEL_NAME: ""
+  MODEL_NAME_OCR: ""

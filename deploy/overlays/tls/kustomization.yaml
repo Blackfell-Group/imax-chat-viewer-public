@@ -1,0 +1,69 @@
+# TLS everywhere overlay.
+#
+#   kubectl apply -k deploy/overlays/tls
+#
+# The base deploys plaintext behind a TLS-terminating front — correct when the
+# front is the only encrypted hop. Apply this instead when the enclave requires
+# every connection to be TLS, including pod-to-pod: it mounts a certificate into
+# all six pods, turns TLS on, tells the SPA edge to reach the enrichment pods
+# over https, and flips the probes to HTTPS so the kubelet does not health-check
+# a TLS port in plaintext and restart everything.
+#
+# Create the certificate Secret first — cert material never lives in this
+# repository:
+#
+#   kubectl create secret generic imax-tls \
+#     --from-file=tls.crt=<server cert or chain>.pem \
+#     --from-file=tls.key=<server key>.pem \
+#     --from-file=ca.pem=<enclave root CA>.pem
+#
+# If nobody is running kubectl — an automated cluster, certificates held in AWS
+# Secrets Manager — use ../tls-awssm instead. Same resulting state; an
+# initContainer fetches the material at pod start rather than a human staging
+# it first. That is the target environment path.
+#
+# The certificate must be valid for the in-cluster service names the SPA edge
+# dials — imax-mock-search, imax-mock-translation, imax-mock-entities,
+# imax-mock-summarize, imax-mock-ocr — plus whatever name the front uses to
+# reach imax-spa. A SAN list covering all six, or a wildcard the enclave PKI
+# will issue for the namespace, is the usual answer. See AIRGAP.md §10.
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - ../../k8s
+
+# Turns TLS on in every pod: deploy/tls.js switches to https the moment
+# TLS_CERT_FILE and TLS_KEY_FILE are readable.
+configMapGenerator:
+  - name: imax-tls-config
+    literals:
+      - TLS_CERT_FILE=/etc/tls/tls.crt
+      - TLS_KEY_FILE=/etc/tls/tls.key
+      - TLS_CA_FILE=/etc/tls/ca.pem
+      # require ⇒ mutual TLS: clients must present a cert signed by ca.pem.
+      # Leave at none unless the enclave mandates mTLS between pods.
+      - TLS_CLIENT_AUTH=none
+      # The SPA edge dials the enrichment pods over TLS as well.
+      - UPSTREAM_SCHEME=https
+generatorOptions:
+  disableNameSuffixHash: true
+
+# One JSON6902 patch per Deployment. Two reasons it is not a single
+# label-selected strategic merge: the container name is a merge key, so naming
+# a container that does not exist silently ADDS one; and envFrom/volumeMounts
+# have no merge key, so a strategic merge REPLACES them and would drop the
+# model-gateway and auth configuration. These patches append.
+patches:
+  - path: patch-imax-spa.yaml
+    target: {kind: Deployment, name: imax-spa}
+  - path: patch-imax-mock-search.yaml
+    target: {kind: Deployment, name: imax-mock-search}
+  - path: patch-imax-mock-translation.yaml
+    target: {kind: Deployment, name: imax-mock-translation}
+  - path: patch-imax-mock-entities.yaml
+    target: {kind: Deployment, name: imax-mock-entities}
+  - path: patch-imax-mock-summarize.yaml
+    target: {kind: Deployment, name: imax-mock-summarize}
+  - path: patch-imax-mock-ocr.yaml
+    target: {kind: Deployment, name: imax-mock-ocr}

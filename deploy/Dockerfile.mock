@@ -1,0 +1,67 @@
+# syntax=docker/dockerfile:1
+# One image per enrichment service (SERVICE build-arg selects the route
+# module). Multi-stage: dependencies install once in the build stage; the
+# final image carries only the runtime files. Base pinned to the Node 22 LTS
+# line on Alpine per the target environment's container guidance; runs as the non-root
+# `node` user; no secrets baked — configuration is env-only (SERVICE, PORT).
+#
+# AIR-GAP BUILD (see deploy/AIRGAP.md). Every network dependency is a
+# build-arg so the enclave's yard can rebuild this unchanged:
+#   NODE_BASE     approved in-enclave base image
+#   NPM_REGISTRY  the enclave's internal npm mirror
+#   OS_PATCH=0    skip apk upgrade where no Alpine mirror is reachable
+# Defaults are the public, digest-pinned image used low-side and in CI.
+
+ARG NODE_BASE=node:22-alpine@sha256:c610fcdfb1d5b4740dd70c284ed3cb16bb857e0f7166196e36a5501df7a3aa32
+
+FROM ${NODE_BASE} AS deps
+ARG NPM_REGISTRY=
+ENV CI=true \
+    NPM_CONFIG_FUND=false \
+    NPM_CONFIG_AUDIT=false \
+    NPM_CONFIG_UPDATE_NOTIFIER=false
+WORKDIR /app
+# Lockfile + `npm ci`, not `npm install`: without a lock, express's transitive
+# ranges resolve at build time, so our image and the enclave's rebuild of the
+# same source can differ — and against a curated internal mirror an unpinned
+# range can resolve to a version the mirror does not carry. Regenerate with
+# scripts/refresh-mock-lock.sh.
+COPY deploy/mock-package.json package.json
+COPY deploy/mock-package-lock.json package-lock.json
+RUN if [ -n "$NPM_REGISTRY" ]; then npm config set registry "$NPM_REGISTRY"; fi \
+  && npm ci --omit=dev && npm cache clean --force
+
+FROM ${NODE_BASE}
+ARG OS_PATCH=1
+# Patch OS packages to current, and drop npm from the runtime image — the
+# pod only needs the node binary, and npm's bundled modules carry their own
+# CVE surface (the trivy CRITICAL gate enforces both). Removing npm is not
+# conditional: it is a hardening step, not a network one.
+RUN if [ "$OS_PATCH" = "1" ]; then apk upgrade --no-cache; fi \
+  && rm -rf /usr/local/lib/node_modules/npm /usr/local/bin/npm /usr/local/bin/npx /opt/yarn*
+ARG SERVICE
+ENV SERVICE=${SERVICE} \
+    NODE_ENV=production \
+    PORT=5177
+WORKDIR /app
+COPY --from=deps /app/node_modules ./node_modules
+COPY routes ./routes
+COPY providers ./providers
+COPY data ./data
+COPY static ./static
+COPY deploy/mock-entry.js ./mock-entry.js
+COPY deploy/tls.js ./tls.js
+# Certificate staging for the tls-awssm overlay. Not on the serving path — the
+# overlay runs secrets-init.js as an initContainer from THIS image, so there is
+# no second image to build, scan, or ferry.
+COPY deploy/secrets-init.js ./secrets-init.js
+COPY deploy/aws-sigv4.js ./aws-sigv4.js
+# Numeric UID (the image's `node` user): kubelet can only verify
+# runAsNonRoot against a numeric USER.
+USER 1000
+EXPOSE 5177
+LABEL org.opencontainers.image.title="imax-mock-${SERVICE}" \
+      org.opencontainers.image.description="IMAX mock enrichment service pod (route module: ${SERVICE}); port 5177; env: SERVICE, PORT" \
+      org.opencontainers.image.vendor="River Hawk Consulting, LLC" \
+      org.opencontainers.image.source="https://github.com/Blackfell-Group/imax-chat-viewer"
+CMD ["node", "mock-entry.js"]
